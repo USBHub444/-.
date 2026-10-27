@@ -1,11 +1,20 @@
 --[[
-    RUOK Hub UI  x  Wind UI  (ไฟล์เดียวรวมทุกอย่าง)
-
-    - ส่วนที่ 1 : Wind UI v1.6.65 ฉบับเต็ม (ไม่ได้ตัดอะไรออก) โดย Footagesus  -  License: MIT
-    - ส่วนที่ 2 : โครงสร้าง RUOK Hub ของคุณ (Library / Window / Tab / Element) ที่ทำงานบน Wind UI
-                  + สวิตช์/สไลเดอร์สไตล์ตามภาพ + ปุ่มลัดมือถือ/คีย์บอร์ด + ตัวปรับสี + ธีมสำเร็จรูป
-                  + แท็บ "วิธีใช้งาน" และแท็บ "Settings"
+    RUOK Hub UI  +  Wind UI  (ไฟล์เดียว)
+    - ส่วนที่ 1 : Wind UI v1.6.65 ฉบับเต็ม (ไม่ได้แก้) โดย Footagesus - License: MIT
+    - ส่วนที่ 2 : UI ของคุณ (โครงสร้างเดิมทั้งหมด) + ส่วนที่เพิ่ม: สะพาน Wind, ปุ่มลัด, สวิตช์/สไลเดอร์สไตล์กระจก,
+                  ปุ่มควบคุมหน้าต่างหลายสไตล์, ปุ่มเปิด UI ใหม่, ปรับแต่งซ้ายบน, แท็บวิธีใช้งาน/ตั้งค่า
 ]]
+
+do
+	local okp, p = pcall(function() return (gethui and gethui()) or game:GetService("CoreGui") end)
+	if okp and p then
+		for _, n in ipairs({ "WindUI", "WindUI/Notifications", "WindUI/Dropdowns", "WindUI/Tooltips", "RUOKUILibrary", "RUOKUILibrary_Shortcuts" }) do
+			for _, c in ipairs(p:GetChildren()) do
+				if c.Name == n then pcall(function() c:Destroy() end) end
+			end
+		end
+	end
+end
 
 local WindUI = (function()
 --[[
@@ -15656,14 +15665,6 @@ end
 return aa
 end)()
 
---====================================================================================
---  RUOK Hub UI  (โครงสร้างของคุณ: Library / Window / Tab / Element)  +  Wind UI เต็มไฟล์
---  ส่วนล่างนี้คือโค้ดของคุณที่ถูกปรับให้ทำงานบนฐาน Wind UI ด้านบน
---  - สวิตช์ / สไลเดอร์ / ปุ่มลัด  : สไตล์ตามภาพ (กระจกเรืองแสง)
---  - ปุ่ม / ช่องพิมพ์ / รายชื่อ    : ใช้ของ Wind UI จริง
---  - ธีมสำเร็จรูป, ตัวอย่างสด, ตัวปรับสี + บันทึกโค้ดสี, ปรับแต่งมุมซ้ายบน, หน้าวิธีใช้งาน
---====================================================================================
-
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local UIS = game:GetService("UserInputService")
@@ -15674,9 +15675,7 @@ local CoreGui = game:GetService("CoreGui")
 local LocalPlayer = Players.LocalPlayer
 local NAME = "RUOKUILibrary"
 local FILE = "RUOKHub_theme.json"
-local WIND_THEME = "RUOKTheme"
 local BLACK, WHITE = Color3.new(0, 0, 0), Color3.new(1, 1, 1)
-local Creator = WindUI.Creator
 
 local Library = {
 	Flags = {},
@@ -15685,22 +15684,45 @@ local Library = {
 	SpinSpeed = 90,
 	Rainbow = false,
 	Transparency = 0,
-	UIScale = 1,
+	FontSize = 13,
 	ThemeName = "Sky Milk",
-	Title = "! Clown",
-	Author = "r3z by uou",
-	Icon = "lucide:sparkles",
-	ShowOpenButton = true,
-	ShortcutsEnabled = true,
-	KeyboardShortcuts = true,
-	ShortcutScale = 1,
-	ShortcutTransparency = 0.15,
-	ShortcutLocked = false,
-	ShortcutPos = {},
-	ShortcutKeys = {},
-	CustomPresets = {},
-	WindUI = WindUI,
 }
+Library.Title = "! Clown"
+Library.Sub = "r3z by uou"
+Library.TitleSize = 24
+Library.SubSize = 14
+Library.LogoUrl = "https://raw.githubusercontent.com/USBHub444/USBHub444/refs/heads/main/file_0000000072d08211b878eafb071d0b94.png"
+Library.LogoWidth = 160
+Library.ShowLogo = true
+Library.ControlStyle = "Mac Glossy"
+Library.OpenButtonStyle = "Orb"
+Library.OpenButtonScale = 1
+Library.ShowOpenButton = nil
+Library.ShortcutsEnabled = true
+Library.KeyboardShortcuts = true
+Library.ShortcutScale = 1
+Library.ShortcutTransparency = 0.15
+Library.ShortcutLocked = false
+Library.ShortcutPos = {}
+Library.ShortcutKeys = {}
+Library.CustomPresets = {}
+Library.WindUI = WindUI
+
+do
+	local function rgb(r, g, b) return Color3.fromRGB(r, g, b) end
+	local macColors = { close = rgb(240, 70, 70), min = rgb(250, 200, 40), max = rgb(60, 200, 70) }
+	Library.ControlStyleNames = { "Mac Glossy", "Glass Square", "Mac Dots", "Dark Pill", "Mac Dark", "Light Rings", "Violet Sun", "Aqua Candy" }
+	Library.ControlStyles = {
+		["Mac Glossy"] = { Pad = 8, Size = 26, Gap = 8, Shape = "circle", Bg = rgb(225, 238, 255), BgT = 0.2, Order = { "close", "min", "max" }, Colors = macColors, Icons = true, IconColor = WHITE, Gloss = true },
+		["Glass Square"] = { Pad = 6, Size = 28, Gap = 6, Shape = "square", Bg = rgb(200, 222, 250), BgT = 0.15, Order = { "min", "max", "close" }, Colors = { min = rgb(130, 170, 225), max = rgb(130, 170, 225), close = rgb(235, 70, 70) }, Icons = true, IconColor = WHITE, Gloss = true },
+		["Mac Dots"] = { Pad = 8, Size = 14, Gap = 8, Shape = "circle", Bg = rgb(225, 238, 255), BgT = 0.25, Order = { "close", "min", "max" }, Colors = macColors, Icons = false, Gloss = true },
+		["Dark Pill"] = { Pad = 0, Size = 36, Gap = 0, Shape = "flat", Bg = rgb(40, 72, 125), BgT = 0, Order = { "min", "max", "close" }, Colors = {}, Icons = true, IconColor = WHITE, Dividers = true },
+		["Mac Dark"] = { Pad = 8, Size = 24, Gap = 8, Shape = "circle", Bg = rgb(70, 90, 120), BgT = 0.1, Order = { "close", "min", "max" }, Colors = { close = rgb(235, 70, 70), min = rgb(250, 195, 40), max = rgb(25, 120, 45) }, Icons = true, IconColor = rgb(30, 30, 30) },
+		["Light Rings"] = { Pad = 8, Size = 26, Gap = 8, Shape = "circle", Bg = rgb(240, 247, 255), BgT = 0.1, Order = { "min", "max", "close" }, Colors = { min = rgb(170, 205, 245), max = rgb(130, 180, 240), close = rgb(110, 170, 240) }, Ring = true, RingColor = rgb(90, 150, 225), Icons = true, IconColor = rgb(50, 110, 200) },
+		["Violet Sun"] = { Pad = 8, Size = 26, Gap = 8, Shape = "circle", Bg = rgb(225, 235, 255), BgT = 0.15, Order = { "min", "max", "close" }, Colors = { min = rgb(150, 90, 230), max = rgb(250, 200, 40), close = rgb(235, 60, 70) }, Icons = true, IconColor = rgb(40, 30, 50), Gloss = true },
+		["Aqua Candy"] = { Pad = 8, Size = 26, Gap = 8, Shape = "circle", Bg = rgb(225, 245, 255), BgT = 0.15, Order = { "min", "max", "close" }, Colors = { min = rgb(40, 200, 220), max = rgb(170, 110, 230), close = rgb(250, 110, 170) }, Icons = true, IconColor = WHITE, Gloss = true },
+	}
+end
 
 ----------------------------------------------------------------
 -- ธีมสำเร็จรูป 30 เฉดสี
@@ -15745,44 +15767,27 @@ local spinners = {}
 local bars = {}
 local conns = {}
 local themeListeners = {}
-local shortcuts = {}
-local shortcutOrder = {}
-local windRef = nil
-local startShortcutInput
+local fontLabels = {}
+local shortcuts, shortcutOrder = {}, {}
+local pushWind
 
 local function lum(c) return 0.299 * c.R + 0.587 * c.G + 0.114 * c.B end
 
 local function buildTheme(main, accent, accent2)
 	local light = lum(main) > 0.55
-	local t = {}
-	t.Main = main
-	t.Light = light
-	if light then
-		t.Side = main:Lerp(BLACK, 0.07)
-		t.Element = main:Lerp(BLACK, 0.12)
-		t.Stroke = main:Lerp(BLACK, 0.25)
-		t.Text = Color3.fromRGB(30, 45, 65)
-		t.Sub = Color3.fromRGB(85, 105, 128)
-	else
-		t.Side = main:Lerp(WHITE, 0.05)
-		t.Element = main:Lerp(WHITE, 0.09)
-		t.Stroke = main:Lerp(WHITE, 0.22)
-		t.Text = Color3.fromRGB(240, 244, 252)
-		t.Sub = Color3.fromRGB(150, 160, 180)
-	end
-	t.Accent = accent
-	t.Accent2 = accent2
-	if lum(accent) > 0.62 then
-		t.OnAccent = Color3.fromRGB(20, 24, 32)
-	else
-		t.OnAccent = WHITE
-	end
-	return t
+	return {
+		Main = main,
+		Side = light and main:Lerp(BLACK, 0.07) or main:Lerp(WHITE, 0.05),
+		Element = light and main:Lerp(BLACK, 0.12) or main:Lerp(WHITE, 0.09),
+		Stroke = light and main:Lerp(BLACK, 0.25) or main:Lerp(WHITE, 0.22),
+		Text = light and Color3.fromRGB(30, 45, 65) or Color3.fromRGB(240, 244, 252),
+		Sub = light and Color3.fromRGB(85, 105, 128) or Color3.fromRGB(150, 160, 180),
+		Accent = accent,
+		Accent2 = accent2,
+		OnAccent = lum(accent) > 0.62 and Color3.fromRGB(20, 24, 32) or WHITE,
+	}
 end
 
-----------------------------------------------------------------
--- ฟังก์ชันช่วย
-----------------------------------------------------------------
 local function create(class, props)
 	local inst = Instance.new(class)
 	local parent
@@ -15797,8 +15802,8 @@ local function corner(inst, r)
 	return create("UICorner", { CornerRadius = UDim.new(0, r), Parent = inst })
 end
 
-local function tween(inst, props, t, style)
-	local tw = TweenService:Create(inst, TweenInfo.new(t or 0.2, style or Enum.EasingStyle.Quad, Enum.EasingDirection.Out), props)
+local function tween(inst, props, t)
+	local tw = TweenService:Create(inst, TweenInfo.new(t or 0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), props)
 	tw:Play()
 	return tw
 end
@@ -15825,7 +15830,7 @@ local function applyBindings(animate, onlyKey)
 	for i = #bindings, 1, -1 do
 		local b = bindings[i]
 		local inst, prop, key = b[1], b[2], b[3]
-		if not inst.Parent or not inst:IsDescendantOf(game) then
+		if not inst:IsDescendantOf(game) then
 			table.remove(bindings, i)
 		elseif not onlyKey or key == onlyKey then
 			if animate then
@@ -15837,44 +15842,66 @@ local function applyBindings(animate, onlyKey)
 	end
 end
 
-local function fnt(weight)
-	local fam = "rbxassetid://12187365364"
-	local ok, f = pcall(function() return Font.new(fam, weight or Enum.FontWeight.Medium) end)
-	if ok and f then return f end
-	return Font.new("rbxasset://fonts/families/GothamSSm.json", weight or Enum.FontWeight.Medium)
+local function ringSequence()
+	local base, a, b = Theme.Stroke, Theme.Accent, Theme.Accent2
+	return ColorSequence.new({
+		ColorSequenceKeypoint.new(0, base),
+		ColorSequenceKeypoint.new(0.15, a),
+		ColorSequenceKeypoint.new(0.25, b),
+		ColorSequenceKeypoint.new(0.4, base),
+		ColorSequenceKeypoint.new(0.6, base),
+		ColorSequenceKeypoint.new(0.65, a),
+		ColorSequenceKeypoint.new(0.75, b),
+		ColorSequenceKeypoint.new(0.9, base),
+		ColorSequenceKeypoint.new(1, base),
+	})
+end
+
+local function refreshGradients()
+	local ring = ringSequence()
+	for _, g in ipairs(spinners) do if g.Parent then g.Color = ring end end
+	local bar = ColorSequence.new(Theme.Accent, Theme.Accent2)
+	for _, g in ipairs(bars) do if g.Parent then g.Color = bar end end
+end
+
+local function fireListeners(source)
+	for _, fn in ipairs(themeListeners) do pcall(fn, source) end
+end
+
+local function setColors(main, a, b, instant, source)
+	for k, v in pairs(buildTheme(main, a, b)) do Theme[k] = v end
+	applyBindings(not instant)
+	refreshGradients()
+	if pushWind then pushWind(not instant, true) end
+	fireListeners(source)
+end
+
+local function setAccent(a, b)
+	Theme.Accent, Theme.Accent2 = a, b
+	Theme.OnAccent = lum(a) > 0.62 and Color3.fromRGB(20, 24, 32) or WHITE
+	applyBindings(false, "Accent")
+	applyBindings(false, "OnAccent")
+	refreshGradients()
+	if pushWind then pushWind(false) end
 end
 
 local function textLabel(parent, props, key)
 	props.BackgroundTransparency = 1
 	props.Parent = parent
-	props.FontFace = props.FontFace or fnt(props.Weight)
-	props.Weight = nil
-	props.TextSize = props.TextSize or 14
+	props.Font = props.Font or Enum.Font.GothamMedium
+	props.TextSize = props.TextSize or Library.FontSize
 	local l = create("TextLabel", props)
 	if key then bind(l, "TextColor3", key) end
+	table.insert(fontLabels, { inst = l, baseSize = props.TextSize })
 	return l
 end
 
-local function iconProps(name)
-	local ok, r = pcall(function() return Creator.Icon(name) end)
-	if ok and type(r) == "table" and r[1] and r[2] then
-		return { Image = r[1], ImageRectSize = r[2].ImageRectSize, ImageRectOffset = r[2].ImageRectPosition }
+local function updateFontSize(delta)
+	for _, item in ipairs(fontLabels) do
+		if item.inst and item.inst.Parent then
+			item.inst.TextSize = math.clamp(item.baseSize + delta, 8, 30)
+		end
 	end
-	return nil
-end
-
-local function iconLabel(parent, name, size, colorKey, extra)
-	local p = { BackgroundTransparency = 1, Size = UDim2.fromOffset(size, size), Parent = parent }
-	local ip = iconProps(name)
-	if ip then
-		for k, v in pairs(ip) do p[k] = v end
-	end
-	if extra then
-		for k, v in pairs(extra) do p[k] = v end
-	end
-	local img = create("ImageLabel", p)
-	if colorKey then bind(img, "ImageColor3", colorKey) end
-	return img, ip ~= nil
 end
 
 local function isPress(input)
@@ -15905,28 +15932,23 @@ local function dragInput(handle, fn, scroller)
 	end))
 end
 
-local function makeDraggable(handle, target, onEnd)
+local function makeDraggable(handle, target)
 	local state = { moved = false }
 	local dragging, dragStart, startPos = false, nil, nil
 	track(handle.InputBegan:Connect(function(input)
 		if isPress(input) then
 			dragging, state.moved = true, false
 			dragStart, startPos = input.Position, target.Position
+			input.Changed:Connect(function()
+				if input.UserInputState == Enum.UserInputState.End then dragging = false end
+			end)
 		end
 	end))
 	track(UIS.InputChanged:Connect(function(input)
 		if dragging and isMove(input) then
 			local d = input.Position - dragStart
-			if math.abs(d.X) + math.abs(d.Y) > 6 then state.moved = true end
-			if state.moved then
-				target.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + d.X, startPos.Y.Scale, startPos.Y.Offset + d.Y)
-			end
-		end
-	end))
-	track(UIS.InputEnded:Connect(function(input)
-		if dragging and isPress(input) then
-			dragging = false
-			if state.moved and onEnd then onEnd(target.Position) end
+			if math.abs(d.X) + math.abs(d.Y) > 4 then state.moved = true end
+			target.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + d.X, startPos.Y.Scale, startPos.Y.Offset + d.Y)
 		end
 	end))
 	return state
@@ -15944,45 +15966,167 @@ local function hexStr(c)
 	return string.format("#%02X%02X%02X", math.floor(c.R * 255 + 0.5), math.floor(c.G * 255 + 0.5), math.floor(c.B * 255 + 0.5))
 end
 
-local function rgbStr(c)
-	return string.format("%d, %d, %d", math.floor(c.R * 255 + 0.5), math.floor(c.G * 255 + 0.5), math.floor(c.B * 255 + 0.5))
-end
-
 local function c2t(c) return { math.floor(c.R * 255 + 0.5), math.floor(c.G * 255 + 0.5), math.floor(c.B * 255 + 0.5) } end
 local function t2c(t) return Color3.fromRGB(t[1], t[2], t[3]) end
 
-local function copyText(text)
-	local fn = setclipboard or toclipboard or (syn and syn.write_clipboard)
-	if fn then
-		local ok = pcall(function() fn(text) end)
-		return ok
+do
+	local p = Presets[1]
+	for k, v in pairs(buildTheme(p.Main, p.Accent, p.Accent2)) do Theme[k] = v end
+end
+
+function Library:SetTheme(name)
+	for _, list in ipairs({ Presets, Library.CustomPresets }) do
+		for _, p in ipairs(list) do
+			if p.Name == name then
+				Library.ThemeName = name
+				setColors(p.Main, p.Accent, p.Accent2, false)
+				return true
+			end
+		end
 	end
 	return false
 end
 
-local function parseColor(text)
-	text = tostring(text or ""):gsub("%s+", "")
-	local r, g, b = text:match("^(%d+),(%d+),(%d+)$")
-	if r then
-		return Color3.fromRGB(math.clamp(tonumber(r), 0, 255), math.clamp(tonumber(g), 0, 255), math.clamp(tonumber(b), 0, 255))
+function Library:SaveConfig()
+	if not writefile then return false end
+	local customs = {}
+	for _, p in ipairs(Library.CustomPresets) do
+		customs[#customs + 1] = { Name = p.Name, Main = c2t(p.Main), Accent = c2t(p.Accent), Accent2 = c2t(p.Accent2) }
 	end
-	local hex = text:gsub("^#", "")
-	if #hex == 3 then
-		hex = hex:sub(1, 1) .. hex:sub(1, 1) .. hex:sub(2, 2) .. hex:sub(2, 2) .. hex:sub(3, 3) .. hex:sub(3, 3)
+	local keys = {}
+	for id, nm in pairs(Library.ShortcutKeys) do keys[id] = nm end
+	for id, sc in pairs(shortcuts) do
+		if sc.Key then keys[id] = sc.Key.Name end
 	end
-	if #hex == 6 then
-		local n = tonumber(hex, 16)
-		if n then
-			return Color3.fromRGB(math.floor(n / 65536), math.floor((n / 256) % 256), n % 256)
+	local obPos
+	if Library.OpenButtonPos then
+		local p = Library.OpenButtonPos
+		obPos = { p.X.Scale, p.X.Offset, p.Y.Scale, p.Y.Offset }
+	end
+	return (pcall(function()
+		writefile(FILE, HttpService:JSONEncode({
+			Main = c2t(Theme.Main), Accent = c2t(Theme.Accent), Accent2 = c2t(Theme.Accent2),
+			Transparency = Library.Transparency, Spin = Library.SpinEnabled,
+			SpinSpeed = Library.SpinSpeed, Theme = Library.ThemeName,
+			FontSize = Library.FontSize,
+			ToggleKey = Library.ToggleKey.Name,
+			Title = Library.Title, Sub = Library.Sub, TitleSize = Library.TitleSize, SubSize = Library.SubSize,
+			LogoUrl = Library.LogoUrl, LogoWidth = Library.LogoWidth, ShowLogo = Library.ShowLogo,
+			ControlStyle = Library.ControlStyle, OpenButtonStyle = Library.OpenButtonStyle,
+			OpenButtonScale = Library.OpenButtonScale, ShowOpenButton = Library.ShowOpenButton, OpenButtonPos = obPos,
+			ShortcutsEnabled = Library.ShortcutsEnabled, KeyboardShortcuts = Library.KeyboardShortcuts,
+			ShortcutScale = Library.ShortcutScale, ShortcutTransparency = Library.ShortcutTransparency,
+			ShortcutLocked = Library.ShortcutLocked, ShortcutPos = Library.ShortcutPos, ShortcutKeys = keys,
+			CustomPresets = customs,
+		}))
+	end))
+end
+
+function Library:LoadConfig()
+	if not (isfile and readfile) then return false end
+	local ok, data = pcall(function()
+		if isfile(FILE) then return HttpService:JSONDecode(readfile(FILE)) end
+	end)
+	if ok and type(data) == "table" and data.Main and data.Accent and data.Accent2 then
+		Library.ThemeName = data.Theme or "Custom"
+		Library.Transparency = data.Transparency or 0
+		if data.Spin ~= nil then Library.SpinEnabled = data.Spin end
+		Library.SpinSpeed = data.SpinSpeed or Library.SpinSpeed
+		Library.FontSize = data.FontSize or 13
+		if data.ToggleKey and Enum.KeyCode[data.ToggleKey] then Library.ToggleKey = Enum.KeyCode[data.ToggleKey] end
+		Library.Title = data.Title or Library.Title
+		Library.Sub = data.Sub or Library.Sub
+		Library.TitleSize = data.TitleSize or Library.TitleSize
+		Library.SubSize = data.SubSize or Library.SubSize
+		if data.LogoUrl ~= nil then Library.LogoUrl = data.LogoUrl end
+		Library.LogoWidth = data.LogoWidth or Library.LogoWidth
+		if data.ShowLogo ~= nil then Library.ShowLogo = data.ShowLogo end
+		if data.ControlStyle and Library.ControlStyles[data.ControlStyle] then Library.ControlStyle = data.ControlStyle end
+		if data.OpenButtonStyle then Library.OpenButtonStyle = data.OpenButtonStyle end
+		Library.OpenButtonScale = data.OpenButtonScale or 1
+		if data.ShowOpenButton ~= nil then Library.ShowOpenButton = data.ShowOpenButton end
+		if type(data.OpenButtonPos) == "table" and #data.OpenButtonPos == 4 then
+			local p = data.OpenButtonPos
+			Library.OpenButtonPos = UDim2.new(p[1], p[2], p[3], p[4])
 		end
+		if data.ShortcutsEnabled ~= nil then Library.ShortcutsEnabled = data.ShortcutsEnabled end
+		if data.KeyboardShortcuts ~= nil then Library.KeyboardShortcuts = data.KeyboardShortcuts end
+		Library.ShortcutScale = data.ShortcutScale or 1
+		Library.ShortcutTransparency = data.ShortcutTransparency or 0.15
+		if data.ShortcutLocked ~= nil then Library.ShortcutLocked = data.ShortcutLocked end
+		if type(data.ShortcutPos) == "table" then Library.ShortcutPos = data.ShortcutPos end
+		if type(data.ShortcutKeys) == "table" then Library.ShortcutKeys = data.ShortcutKeys end
+		Library.CustomPresets = {}
+		if type(data.CustomPresets) == "table" then
+			for _, p in ipairs(data.CustomPresets) do
+				if p.Name and p.Main and p.Accent and p.Accent2 then
+					table.insert(Library.CustomPresets, { Name = p.Name, Main = t2c(p.Main), Accent = t2c(p.Accent), Accent2 = t2c(p.Accent2) })
+				end
+			end
+		end
+		setColors(t2c(data.Main), t2c(data.Accent), t2c(data.Accent2), true)
+		return true
 	end
-	return nil
+	return false
+end
+
+function Library:AddPreset(p)
+	if type(p) ~= "table" or not p.Name then return false end
+	table.insert(Library.CustomPresets, { Name = p.Name, Main = p.Main, Accent = p.Accent, Accent2 = p.Accent2 })
+	fireListeners("preset")
+	return true
+end
+
+function Library:Destroy()
+	if Library._cleanup then pcall(Library._cleanup) end
+	for _, c in ipairs(conns) do pcall(function() c:Disconnect() end) end
+	table.clear(conns)
+	table.clear(bindings)
+	table.clear(spinners)
+	table.clear(bars)
+	table.clear(themeListeners)
+	table.clear(fontLabels)
+	if Library.Gui then Library.Gui:Destroy() end
+	Library.Gui, Library.NotifyHolder, Library.Window = nil, nil, nil
+end
+
+local notifyOrder = 0
+function Library:Notify(o)
+	if not Library.NotifyHolder then return end
+	o = o or {}
+	local dur = o.Duration or 4
+	notifyOrder = notifyOrder + 1
+	local n = create("CanvasGroup", {
+		Size = UDim2.new(1, 0, 0, 60), BorderSizePixel = 0, GroupTransparency = 1,
+		LayoutOrder = notifyOrder, Parent = Library.NotifyHolder,
+	})
+	bind(n, "BackgroundColor3", "Main")
+	corner(n, 8)
+	local st = create("UIStroke", { Thickness = 1.6, Parent = n })
+	bind(st, "Color", "Accent")
+	textLabel(n, { Text = o.Title or "แจ้งเตือน", Font = Enum.Font.GothamBold, TextSize = 14, TextXAlignment = Enum.TextXAlignment.Left, Position = UDim2.new(0, 12, 0, 7), Size = UDim2.new(1, -24, 0, 18) }, "Text")
+	textLabel(n, { Text = o.Text or "", TextSize = 12, TextWrapped = true, TextXAlignment = Enum.TextXAlignment.Left, TextYAlignment = Enum.TextYAlignment.Top, Position = UDim2.new(0, 12, 0, 26), Size = UDim2.new(1, -24, 0, 28) }, "Sub")
+	local prog = create("Frame", { Size = UDim2.new(1, 0, 0, 3), Position = UDim2.new(0, 0, 1, -3), BorderSizePixel = 0, Parent = n })
+	bind(prog, "BackgroundColor3", "Accent")
+	tween(n, { GroupTransparency = 0 }, 0.25)
+	tween(prog, { Size = UDim2.new(0, 0, 0, 3) }, dur)
+	task.delay(dur, function()
+		if n.Parent then
+			tween(n, { GroupTransparency = 1 }, 0.3)
+			task.wait(0.32)
+			n:Destroy()
+		end
+	end)
 end
 
 ----------------------------------------------------------------
--- ธีม: ส่งค่าเดียวกันไปทั้งของเรา (bind) และของ Wind UI (WindUI theme)
+-- [เพิ่ม] ตัวช่วยไอคอน / สะพานธีม Wind UI / ระบบปุ่มลัด
 ----------------------------------------------------------------
+local Creator = WindUI.Creator
+local WIND_THEME = "RUOKTheme"
 local windTheme = { Name = WIND_THEME }
+local windObj = nil
+local lastWindPush = 0
 
 local function syncWindTheme()
 	local t = Theme
@@ -16001,9 +16145,9 @@ local function syncWindTheme()
 	windTheme.Primary = t.Accent
 	windTheme.SliderIcon = t.Sub
 	windTheme.PanelBackground = t.Side
-	windTheme.PanelBackgroundTransparency = 0.35 + Library.Transparency * 0.65
+	windTheme.PanelBackgroundTransparency = 0.35
 	windTheme.ElementBackground = t.Element
-	windTheme.ElementBackgroundTransparency = Library.Transparency
+	windTheme.ElementBackgroundTransparency = 0
 	windTheme.LabelBackground = t.Element
 	windTheme.LabelBackgroundTransparency = 0.3
 	windTheme.DropdownBackground = t.Side
@@ -16011,220 +16155,48 @@ local function syncWindTheme()
 	windTheme.Notification = t.Main
 end
 
-local function ringSequence()
-	local base, a, b = Theme.Stroke, Theme.Accent, Theme.Accent2
-	return ColorSequence.new({
-		ColorSequenceKeypoint.new(0, base),
-		ColorSequenceKeypoint.new(0.15, a),
-		ColorSequenceKeypoint.new(0.25, b),
-		ColorSequenceKeypoint.new(0.4, base),
-		ColorSequenceKeypoint.new(0.6, base),
-		ColorSequenceKeypoint.new(0.65, a),
-		ColorSequenceKeypoint.new(0.75, b),
-		ColorSequenceKeypoint.new(0.9, base),
-		ColorSequenceKeypoint.new(1, base),
-	})
-end
-
-local function refreshGradients()
-	local ring = ringSequence()
-	for _, g in ipairs(spinners) do
-		if g.Parent then g.Color = ring end
-	end
-	local bar = ColorSequence.new(Theme.Accent, Theme.Accent2)
-	for _, g in ipairs(bars) do
-		if g.Parent then g.Color = bar end
-	end
-end
-
-local function fireListeners(source)
-	for _, fn in ipairs(themeListeners) do pcall(fn, source) end
-end
-
-local lastOpenBtn = 0
-local function refreshOpenButton(force)
-	if not windRef or not windRef.EditOpenButton then return end
-	if not force and os.clock() - lastOpenBtn < 0.4 then return end
-	lastOpenBtn = os.clock()
-	pcall(function()
-		windRef.IsOpenButtonEnabled = Library.ShowOpenButton
-		windRef:EditOpenButton({
-			Title = Library.Title,
-			Icon = Library.Icon,
-			CornerRadius = UDim.new(1, 0),
-			StrokeThickness = 2,
-			Enabled = Library.ShowOpenButton,
-			OnlyMobile = false,
-			Draggable = true,
-			Color = ColorSequence.new(Theme.Accent, Theme.Accent2),
-		})
-		if not Library.ShowOpenButton and windRef.OpenButtonMain then
-			windRef.OpenButtonMain:Visible(false)
-		end
-	end)
-end
-
-local function pushTheme(animate)
+pushWind = function(animate, force)
 	syncWindTheme()
-	pcall(function() Creator.UpdateTheme(nil, false, animate, 0.3) end)
-	applyBindings(animate)
-	refreshGradients()
-end
-
-local function setColors(main, a, b, instant, source)
-	for k, v in pairs(buildTheme(main, a, b)) do Theme[k] = v end
-	pushTheme(not instant)
-	fireListeners(source)
-	refreshOpenButton()
-end
-
-local function setAccent(a, b, silent)
-	Theme.Accent, Theme.Accent2 = a, b
-	if lum(a) > 0.62 then
-		Theme.OnAccent = Color3.fromRGB(20, 24, 32)
-	else
-		Theme.OnAccent = WHITE
-	end
-	syncWindTheme()
-	pcall(function() Creator.UpdateTheme(nil, false, false) end)
-	applyBindings(false)
-	refreshGradients()
-	if not silent then
-		fireListeners("accent")
-		refreshOpenButton()
-	end
+	if not windObj then return end
+	if not force and os.clock() - lastWindPush < 0.05 then return end
+	lastWindPush = os.clock()
+	pcall(function() Creator.UpdateTheme(nil, false, animate and true or false, 0.3) end)
 end
 
 do
-	local p = Presets[1]
-	for k, v in pairs(buildTheme(p.Main, p.Accent, p.Accent2)) do Theme[k] = v end
 	syncWindTheme()
 	pcall(function() WindUI:AddTheme(windTheme) end)
 	pcall(function() WindUI:SetTheme(WIND_THEME) end)
 end
 
-function Library:SetTheme(name)
-	for _, p in ipairs(Presets) do
-		if p.Name == name then
-			Library.ThemeName = name
-			setColors(p.Main, p.Accent, p.Accent2, false)
-			return true
-		end
+local function iconProps(name)
+	local ok, r = pcall(function() return Creator.Icon(name) end)
+	if ok and type(r) == "table" and r[1] and r[2] then
+		return { Image = r[1], ImageRectSize = r[2].ImageRectSize, ImageRectOffset = r[2].ImageRectPosition }
 	end
-	for _, p in ipairs(Library.CustomPresets) do
-		if p.Name == name then
-			Library.ThemeName = name
-			setColors(p.Main, p.Accent, p.Accent2, false)
-			return true
-		end
+	return nil
+end
+
+local function iconLabel(parent, name, size, colorKey, extra)
+	local p = { BackgroundTransparency = 1, Size = UDim2.fromOffset(size, size), Parent = parent }
+	local ip = iconProps(name)
+	if ip then
+		for k, v in pairs(ip) do p[k] = v end
+	end
+	if extra then
+		for k, v in pairs(extra) do p[k] = v end
+	end
+	local img = create("ImageLabel", p)
+	if colorKey then bind(img, "ImageColor3", colorKey) end
+	return img, ip ~= nil
+end
+
+local function copyText(text)
+	local fn = setclipboard or toclipboard or (syn and syn.write_clipboard)
+	if fn then
+		return (pcall(function() fn(text) end))
 	end
 	return false
-end
-
-function Library:AddPreset(p)
-	if type(p) ~= "table" or not p.Name then return false end
-	table.insert(Library.CustomPresets, { Name = p.Name, Main = p.Main, Accent = p.Accent, Accent2 = p.Accent2 })
-	fireListeners("preset")
-	return true
-end
-
-----------------------------------------------------------------
--- บันทึก / โหลดการตั้งค่า
-----------------------------------------------------------------
-function Library:SaveConfig()
-	if not writefile then return false end
-	local customs = {}
-	for _, p in ipairs(Library.CustomPresets) do
-		customs[#customs + 1] = { Name = p.Name, Main = c2t(p.Main), Accent = c2t(p.Accent), Accent2 = c2t(p.Accent2) }
-	end
-	local keys = {}
-	for id, sc in pairs(shortcuts) do
-		if sc.Key then keys[id] = sc.Key.Name end
-	end
-	for id, nm in pairs(Library.ShortcutKeys) do
-		if keys[id] == nil then keys[id] = nm end
-	end
-	local data = {
-		Main = c2t(Theme.Main), Accent = c2t(Theme.Accent), Accent2 = c2t(Theme.Accent2),
-		Transparency = Library.Transparency, Spin = Library.SpinEnabled, SpinSpeed = Library.SpinSpeed,
-		Theme = Library.ThemeName, UIScale = Library.UIScale, ToggleKey = Library.ToggleKey.Name,
-		Title = Library.Title, Author = Library.Author, Icon = Library.Icon, ShowOpenButton = Library.ShowOpenButton,
-		ShortcutsEnabled = Library.ShortcutsEnabled, KeyboardShortcuts = Library.KeyboardShortcuts,
-		ShortcutScale = Library.ShortcutScale, ShortcutTransparency = Library.ShortcutTransparency,
-		ShortcutLocked = Library.ShortcutLocked, ShortcutPos = Library.ShortcutPos, ShortcutKeys = keys,
-		CustomPresets = customs,
-	}
-	return (pcall(function() writefile(FILE, HttpService:JSONEncode(data)) end))
-end
-
-function Library:LoadConfig()
-	if not (isfile and readfile) then return false end
-	local ok, data = pcall(function()
-		if isfile(FILE) then return HttpService:JSONDecode(readfile(FILE)) end
-	end)
-	if ok and type(data) == "table" and data.Main and data.Accent and data.Accent2 then
-		Library.ThemeName = data.Theme or "Custom"
-		Library.Transparency = data.Transparency or 0
-		if data.Spin ~= nil then Library.SpinEnabled = data.Spin end
-		Library.SpinSpeed = data.SpinSpeed or Library.SpinSpeed
-		Library.UIScale = data.UIScale or 1
-		if data.ToggleKey and Enum.KeyCode[data.ToggleKey] then Library.ToggleKey = Enum.KeyCode[data.ToggleKey] end
-		Library.Title = data.Title or Library.Title
-		Library.Author = data.Author or Library.Author
-		Library.Icon = data.Icon or Library.Icon
-		if data.ShowOpenButton ~= nil then Library.ShowOpenButton = data.ShowOpenButton end
-		if data.ShortcutsEnabled ~= nil then Library.ShortcutsEnabled = data.ShortcutsEnabled end
-		if data.KeyboardShortcuts ~= nil then Library.KeyboardShortcuts = data.KeyboardShortcuts end
-		Library.ShortcutScale = data.ShortcutScale or 1
-		Library.ShortcutTransparency = data.ShortcutTransparency or 0.15
-		if data.ShortcutLocked ~= nil then Library.ShortcutLocked = data.ShortcutLocked end
-		if type(data.ShortcutPos) == "table" then Library.ShortcutPos = data.ShortcutPos end
-		if type(data.ShortcutKeys) == "table" then Library.ShortcutKeys = data.ShortcutKeys end
-		Library.CustomPresets = {}
-		if type(data.CustomPresets) == "table" then
-			for _, p in ipairs(data.CustomPresets) do
-				if p.Name and p.Main and p.Accent and p.Accent2 then
-					table.insert(Library.CustomPresets, { Name = p.Name, Main = t2c(p.Main), Accent = t2c(p.Accent), Accent2 = t2c(p.Accent2) })
-				end
-			end
-		end
-		for k, v in pairs(buildTheme(t2c(data.Main), t2c(data.Accent), t2c(data.Accent2))) do Theme[k] = v end
-		pushTheme(false)
-		return true
-	end
-	return false
-end
-
-----------------------------------------------------------------
--- แจ้งเตือน (ใช้ของ Wind UI)
-----------------------------------------------------------------
-function Library:Notify(o)
-	o = o or {}
-	local ok = pcall(function()
-		WindUI:Notify({
-			Title = o.Title or "แจ้งเตือน",
-			Content = o.Text or o.Content or "",
-			Duration = o.Duration or 4,
-			Icon = o.Icon,
-		})
-	end)
-	return ok
-end
-
-----------------------------------------------------------------
--- ระบบปุ่มลัด  (มือถือ = ปุ่มบนจอ / คอม = คีย์บอร์ด + ปุ่มบนจอ)
---  * ปุ่มบนจอ : คอมกดด้วยเมาส์ได้ มือถือกดด้วยนิ้วได้
---  * คีย์บอร์ด : ใช้ได้เฉพาะอุปกรณ์ที่มีคีย์บอร์ด (มือถือใช้ปุ่มคอมไม่ได้)
-----------------------------------------------------------------
-local shortcutGui = nil
-
-local function ensureShortcutGui()
-	if shortcutGui and shortcutGui.Parent then return shortcutGui end
-	shortcutGui = create("ScreenGui", {
-		Name = NAME .. "_Shortcuts", ResetOnSpawn = false, IgnoreGuiInset = true,
-		ZIndexBehavior = Enum.ZIndexBehavior.Sibling, DisplayOrder = 1001, Parent = getGuiParent(),
-	})
-	return shortcutGui
 end
 
 local function keyLabel(key)
@@ -16237,71 +16209,77 @@ local function keyLabel(key)
 	return n
 end
 
-local function defaultShortcutPos(index)
-	return UDim2.new(1, -78, 0.2, (index - 1) * 82)
-end
-
-local function posFromSaved(t)
-	if type(t) == "table" and #t == 4 then
-		return UDim2.new(t[1], t[2], t[3], t[4])
-	end
-	return nil
-end
-
-local function newShortcutBody(sc)
-	local gui = ensureShortcutGui()
-	local holder = create("Frame", { Name = "Shortcut_" .. sc.Id, Size = UDim2.fromOffset(60, 78), BackgroundTransparency = 1, Visible = false, Parent = gui })
-	local scale = create("UIScale", { Scale = Library.ShortcutScale, Parent = holder })
-
-	local body = create("TextButton", { Name = "Body", Size = UDim2.fromOffset(60, 60), BorderSizePixel = 0, Text = "", AutoButtonColor = false, Parent = holder })
+----------------------------------------------------------------
+-- การ์ดปุ่มสไตล์ในภาพ (ใช้กับปุ่มลัด + ปุ่มเปิด UI แบบ Keycap)
+----------------------------------------------------------------
+local function newCard(parent, o)
+	local holder = create("Frame", { Size = UDim2.fromOffset(78, 106), BackgroundTransparency = 1, Parent = parent })
+	local scale = create("UIScale", { Scale = 1, Parent = holder })
+	local body = create("TextButton", { Name = "Body", Size = UDim2.fromScale(1, 1), BorderSizePixel = 0, Text = "", AutoButtonColor = false, Parent = holder })
 	bind(body, "BackgroundColor3", "Side")
-	body.BackgroundTransparency = Library.ShortcutTransparency
-	corner(body, 16)
-	local stroke = create("UIStroke", { Thickness = 2, Transparency = 0.15, Parent = body })
+	corner(body, 18)
+	local stroke = create("UIStroke", { Thickness = 2, Transparency = 0.1, Parent = body })
 	bind(stroke, "Color", "Accent")
 	create("UIGradient", {
-		Rotation = 90,
-		Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0), NumberSequenceKeypoint.new(1, 0.25) }),
-		Color = ColorSequence.new(WHITE, Color3.fromRGB(190, 205, 235)),
+		Rotation = 90, Color = ColorSequence.new(WHITE, Color3.fromRGB(180, 200, 235)),
+		Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0), NumberSequenceKeypoint.new(1, 0.2) }),
 		Parent = body,
 	})
-
-	-- มุมกรอบ 4 มุม (แบบในภาพ)
+	local cap = create("Frame", { Size = UDim2.fromOffset(62, 62), Position = UDim2.new(0.5, -31, 0, 8), BackgroundColor3 = WHITE, BorderSizePixel = 0, Parent = body })
+	corner(cap, 14)
+	bars[#bars + 1] = create("UIGradient", { Rotation = 90, Color = ColorSequence.new(Theme.Accent, Theme.Accent2), Parent = cap })
 	local function bracket(x, y, ax, ay)
-		local h = create("Frame", { Size = UDim2.fromOffset(10, 2), BorderSizePixel = 0, BackgroundTransparency = 0.25, Position = UDim2.new(x, ax * 7, y, ay * 7), AnchorPoint = Vector2.new(x, y), Parent = body })
-		bind(h, "BackgroundColor3", "Text")
-		corner(h, 1)
-		local v = create("Frame", { Size = UDim2.fromOffset(2, 10), BorderSizePixel = 0, BackgroundTransparency = 0.25, Position = UDim2.new(x, ax * 7, y, ay * 7), AnchorPoint = Vector2.new(x, y), Parent = body })
-		bind(v, "BackgroundColor3", "Text")
-		corner(v, 1)
+		local h = create("Frame", { Size = UDim2.fromOffset(11, 3), BorderSizePixel = 0, BackgroundColor3 = WHITE, BackgroundTransparency = 0.1, Position = UDim2.new(x, ax * 6, y, ay * 6), AnchorPoint = Vector2.new(x, y), Parent = cap })
+		corner(h, 2)
+		local v = create("Frame", { Size = UDim2.fromOffset(3, 11), BorderSizePixel = 0, BackgroundColor3 = WHITE, BackgroundTransparency = 0.1, Position = UDim2.new(x, ax * 6, y, ay * 6), AnchorPoint = Vector2.new(x, y), Parent = cap })
+		corner(v, 2)
 	end
 	bracket(0, 0, 1, 1)
 	bracket(1, 0, -1, 1)
 	bracket(0, 1, 1, -1)
 	bracket(1, 1, -1, -1)
+	local keyText = create("TextLabel", { BackgroundTransparency = 1, Text = "", Font = Enum.Font.GothamBold, TextSize = 30, TextColor3 = WHITE, Size = UDim2.fromScale(1, 1), Parent = cap })
+	local keyIcon = iconLabel(cap, o.Icon or "keyboard", 30, nil, { ImageColor3 = WHITE, Position = UDim2.new(0.5, -15, 0.5, -15) })
+	local title = textLabel(body, { Text = o.Title or "", Font = Enum.Font.GothamBold, TextSize = 12, TextTruncate = Enum.TextTruncate.AtEnd, Position = UDim2.fromOffset(4, 74), Size = UDim2.new(1, -8, 0, 16) }, "Text")
+	local sub = textLabel(body, { Text = o.Sub or "", Font = Enum.Font.Gotham, TextSize = 10, TextTruncate = Enum.TextTruncate.AtEnd, Position = UDim2.fromOffset(4, 90), Size = UDim2.new(1, -8, 0, 12) }, "Sub")
+	return { Holder = holder, Body = body, Stroke = stroke, Cap = cap, KeyText = keyText, KeyIcon = keyIcon, Title = title, Sub = sub, Scale = scale }
+end
 
-	local keyText = textLabel(body, { Text = "", Weight = Enum.FontWeight.Bold, TextSize = 24, Size = UDim2.fromScale(1, 1), TextTruncate = Enum.TextTruncate.AtEnd }, "Text")
-	local keyIcon = iconLabel(body, sc.Icon or "keyboard", 28, "Text", { Position = UDim2.fromScale(0.5, 0.5), AnchorPoint = Vector2.new(0.5, 0.5) })
+----------------------------------------------------------------
+-- ปุ่มลัด  (บนจอ = มือถือกดนิ้ว / คอมกดเมาส์ ,  คีย์บอร์ด = เฉพาะคอม)
+----------------------------------------------------------------
+local shortcutGui = nil
 
-	local cap = textLabel(holder, { Text = sc.Name, TextSize = 11, Weight = Enum.FontWeight.SemiBold, Position = UDim2.fromOffset(-10, 62), Size = UDim2.new(1, 20, 0, 14), TextTruncate = Enum.TextTruncate.AtEnd }, "Text")
-	cap.TextStrokeTransparency = 0.7
+local function ensureShortcutGui()
+	if shortcutGui and shortcutGui.Parent then return shortcutGui end
+	shortcutGui = create("ScreenGui", {
+		Name = NAME .. "_Shortcuts", ResetOnSpawn = false, IgnoreGuiInset = true,
+		ZIndexBehavior = Enum.ZIndexBehavior.Sibling, DisplayOrder = 1001, Parent = getGuiParent(),
+	})
+	return shortcutGui
+end
 
-	sc.Holder, sc.Body, sc.Stroke, sc.KeyText, sc.KeyIcon, sc.Scale, sc.Caption = holder, body, stroke, keyText, keyIcon, scale, cap
-	return holder
+local function defaultShortcutPos(index)
+	return UDim2.new(1, -96, 0.15, (index - 1) * 114)
+end
+
+local function posFromSaved(t)
+	if type(t) == "table" and #t == 4 then return UDim2.new(t[1], t[2], t[3], t[4]) end
+	return nil
 end
 
 local function paintShortcut(sc)
-	if not sc.Body then return end
+	if not sc.Card then return end
 	local showKey = sc.Key ~= nil and UIS.KeyboardEnabled and Library.KeyboardShortcuts
-	sc.KeyText.Text = showKey and keyLabel(sc.Key) or ""
-	sc.KeyText.Visible = showKey
-	sc.KeyIcon.Visible = not showKey
+	sc.Card.KeyText.Text = showKey and keyLabel(sc.Key) or ""
+	sc.Card.KeyText.Visible = showKey
+	sc.Card.KeyIcon.Visible = not showKey
 	if sc.Mode == "Toggle" and sc.Active then
-		tween(sc.Stroke, { Thickness = 3.5, Transparency = 0 }, 0.15)
-		sc.Body.BackgroundColor3 = Theme.Accent:Lerp(Theme.Side, 0.55)
+		tween(sc.Card.Stroke, { Thickness = 4, Transparency = 0 }, 0.15)
+		sc.Card.Cap.BackgroundTransparency = 0
 	else
-		tween(sc.Stroke, { Thickness = 2, Transparency = 0.15 }, 0.15)
-		sc.Body.BackgroundColor3 = Theme.Side
+		tween(sc.Card.Stroke, { Thickness = 2, Transparency = 0.1 }, 0.15)
+		sc.Card.Cap.BackgroundTransparency = (sc.Mode == "Toggle") and 0.35 or 0
 	end
 end
 
@@ -16311,29 +16289,23 @@ Shortcut.__index = Shortcut
 function Shortcut:Show()
 	self.Wanted = true
 	if not Library.ShortcutsEnabled then
-		if self.Holder then self.Holder.Visible = false end
+		self.Card.Holder.Visible = false
 		return
 	end
-	if not self.Holder then newShortcutBody(self) self:_wire() end
-	self.Holder.Visible = true
-	self.Holder.Size = UDim2.fromOffset(60, 78)
-	self.Scale.Scale = 0.2
-	tween(self.Scale, { Scale = Library.ShortcutScale }, 0.25, Enum.EasingStyle.Back)
+	self.Card.Holder.Visible = true
+	self.Card.Scale.Scale = 0.2
+	tween(self.Card.Scale, { Scale = Library.ShortcutScale }, 0.25, Enum.EasingStyle.Back)
 	paintShortcut(self)
 end
 
 function Shortcut:Hide()
 	self.Wanted = false
-	if self.Holder then self.Holder.Visible = false end
+	self.Card.Holder.Visible = false
 end
 
 function Shortcut:SetKey(key)
 	self.Key = key
-	if key then
-		Library.ShortcutKeys[self.Id] = key.Name
-	else
-		Library.ShortcutKeys[self.Id] = nil
-	end
+	if key then Library.ShortcutKeys[self.Id] = key.Name else Library.ShortcutKeys[self.Id] = nil end
 	paintShortcut(self)
 	if self.OnKeyChanged then safe(self.OnKeyChanged, key) end
 end
@@ -16341,10 +16313,8 @@ end
 function Shortcut:Trigger()
 	if self.Mode == "Toggle" then self.Active = not self.Active end
 	paintShortcut(self)
-	if self.Body then
-		self.Body.BackgroundTransparency = 0
-		tween(self.Body, { BackgroundTransparency = Library.ShortcutTransparency }, 0.3)
-	end
+	self.Card.Body.BackgroundTransparency = 0.4
+	tween(self.Card.Body, { BackgroundTransparency = Library.ShortcutTransparency }, 0.3)
 	safe(self.Callback, self.Active)
 end
 
@@ -16354,27 +16324,11 @@ function Shortcut:Set(active)
 end
 
 function Shortcut:Destroy()
-	if self.Holder then self.Holder:Destroy() end
+	if self.Card then self.Card.Holder:Destroy() end
 	shortcuts[self.Id] = nil
 	for i, id in ipairs(shortcutOrder) do
 		if id == self.Id then table.remove(shortcutOrder, i) break end
 	end
-end
-
-function Shortcut:_wire()
-	local st = makeDraggable(self.Body, self.Holder, function(p)
-		Library.ShortcutPos[self.Id] = { p.X.Scale, p.X.Offset, p.Y.Scale, p.Y.Offset }
-	end)
-	self.DragState = st
-	self.Body.MouseButton1Click:Connect(function()
-		if not st.moved then self:Trigger() end
-	end)
-	-- ล็อกตำแหน่ง: ถ้าล็อกอยู่ให้เด้งกลับ
-	self.Holder:GetPropertyChangedSignal("Position"):Connect(function()
-		if Library.ShortcutLocked and self._lockedPos and self.Holder.Position ~= self._lockedPos then
-			self.Holder.Position = self._lockedPos
-		end
-	end)
 end
 
 function Library:CreateShortcut(o)
@@ -16382,26 +16336,34 @@ function Library:CreateShortcut(o)
 	local id = o.Id or o.Name or ("shortcut" .. tostring(#shortcutOrder + 1))
 	if shortcuts[id] then
 		local old = shortcuts[id]
-		old.Callback = o.Callback or old.Callback
+		if o.Callback then old.Callback = o.Callback end
 		return old
 	end
 	local sc = setmetatable({
-		Id = id, Name = o.Name or id, Icon = o.Icon, Mode = o.Mode or "Action", Callback = o.Callback,
+		Id = id, Name = o.Name or id, Mode = o.Mode or "Action", Callback = o.Callback,
 		Active = false, Wanted = false, OnKeyChanged = o.OnKeyChanged,
 	}, Shortcut)
-	local savedKey = Library.ShortcutKeys[id]
-	if savedKey and Enum.KeyCode[savedKey] then
-		sc.Key = Enum.KeyCode[savedKey]
-	else
-		sc.Key = o.Key
-	end
+	local saved = Library.ShortcutKeys[id]
+	if saved and Enum.KeyCode[saved] then sc.Key = Enum.KeyCode[saved] else sc.Key = o.Key end
 	shortcuts[id] = sc
 	shortcutOrder[#shortcutOrder + 1] = id
-	newShortcutBody(sc)
-	sc:_wire()
-	local idx = #shortcutOrder
-	sc.Holder.Position = posFromSaved(Library.ShortcutPos[id]) or o.Position or defaultShortcutPos(idx)
-	sc.Holder.Visible = false
+	local card = newCard(ensureShortcutGui(), { Icon = o.Icon, Title = o.Name or id, Sub = o.Desc or (sc.Mode == "Toggle" and "Toggle" or "Press") })
+	sc.Card = card
+	card.Body.BackgroundTransparency = Library.ShortcutTransparency
+	card.Scale.Scale = Library.ShortcutScale
+	card.Holder.Position = posFromSaved(Library.ShortcutPos[id]) or o.Position or defaultShortcutPos(#shortcutOrder)
+	card.Holder.Visible = false
+	local st = makeDraggable(card.Body, card.Holder, function(p)
+		Library.ShortcutPos[id] = { p.X.Scale, p.X.Offset, p.Y.Scale, p.Y.Offset }
+	end)
+	card.Body.MouseButton1Click:Connect(function()
+		if not st.moved then sc:Trigger() end
+	end)
+	card.Holder:GetPropertyChangedSignal("Position"):Connect(function()
+		if Library.ShortcutLocked and sc._lockedPos and card.Holder.Position ~= sc._lockedPos then
+			card.Holder.Position = sc._lockedPos
+		end
+	end)
 	paintShortcut(sc)
 	return sc
 end
@@ -16411,15 +16373,11 @@ function Library:GetShortcut(id) return shortcuts[id] end
 function Library:RefreshShortcuts()
 	for _, id in ipairs(shortcutOrder) do
 		local sc = shortcuts[id]
-		if sc and sc.Holder then
-			sc.Scale.Scale = Library.ShortcutScale
-			sc.Body.BackgroundTransparency = Library.ShortcutTransparency
-			sc.Holder.Visible = sc.Wanted and Library.ShortcutsEnabled
-			if Library.ShortcutLocked then
-				sc._lockedPos = sc.Holder.Position
-			else
-				sc._lockedPos = nil
-			end
+		if sc and sc.Card then
+			sc.Card.Scale.Scale = Library.ShortcutScale
+			sc.Card.Body.BackgroundTransparency = Library.ShortcutTransparency
+			sc.Card.Holder.Visible = sc.Wanted and Library.ShortcutsEnabled
+			if Library.ShortcutLocked then sc._lockedPos = sc.Card.Holder.Position else sc._lockedPos = nil end
 			paintShortcut(sc)
 		end
 	end
@@ -16429,16 +16387,15 @@ function Library:ResetShortcutPositions()
 	Library.ShortcutPos = {}
 	for i, id in ipairs(shortcutOrder) do
 		local sc = shortcuts[id]
-		if sc and sc.Holder then
+		if sc and sc.Card then
 			sc._lockedPos = nil
-			sc.Holder.Position = defaultShortcutPos(i)
+			sc.Card.Holder.Position = defaultShortcutPos(i)
 		end
 	end
 	Library:RefreshShortcuts()
 end
 
--- คีย์บอร์ด (คอมเท่านั้น) — มือถือไม่มีคีย์บอร์ดจึงไม่มีผล
-startShortcutInput = function()
+local function startShortcutInput()
 	track(UIS.InputBegan:Connect(function(input, gp)
 		if gp then return end
 		if input.UserInputType ~= Enum.UserInputType.Keyboard then return end
@@ -16447,147 +16404,30 @@ startShortcutInput = function()
 		if Library.CapturingKey then return end
 		for _, id in ipairs(shortcutOrder) do
 			local sc = shortcuts[id]
-			if sc and sc.Wanted and sc.Key and sc.Key == input.KeyCode then
-				sc:Trigger()
-			end
+			if sc and sc.Wanted and sc.Key and sc.Key == input.KeyCode then sc:Trigger() end
 		end
 	end))
 end
 
-----------------------------------------------------------------
--- Tab (โครงสร้างเดิมของคุณ: AddSection / AddLabel / AddButton / AddToggle / ...)
--- ตัวหน้าต่างและ Tab จริงเป็นของ Wind UI  ส่วน Tab ตัวนี้เป็นตัวห่อ (wrapper)
-----------------------------------------------------------------
-local TabMeta = {}
-
-local nativeNames = {
-	Button = true, Toggle = true, Slider = true, Input = true, Dropdown = true, Colorpicker = true,
-	Keybind = true, ProgressBar = true, Section = true, Group = true, Space = true, Divider = true,
-	HStack = true, VStack = true, Paragraph = true, Image = true, Code = true, Video = true, Viewport = true,
-}
-
-TabMeta.__index = function(t, k)
-	local v = rawget(TabMeta, k)
-	if v ~= nil then return v end
-	if nativeNames[k] then
-		return function(self, o)
-			local fn = self.Wind[k]
-			if not fn then
-				warn("[RUOK UI] Wind UI เวอร์ชันนี้ไม่มี element: " .. tostring(k))
-				return nil
-			end
-			return fn(self.Wind, o)
-		end
+Library._cleanup = function()
+	for _, sc in pairs(shortcuts) do
+		pcall(function()
+			if sc.Card then sc.Card.Holder:Destroy() end
+		end)
 	end
-	return nil
-end
-
-local rowFrames = {}
-
-local function newRow(tab, height)
-	local f = create("Frame", { Size = UDim2.new(1, 0, 0, height), BorderSizePixel = 0, Parent = tab.Page })
-	bind(f, "BackgroundColor3", "Element")
-	f.BackgroundTransparency = Library.Transparency
-	corner(f, tab.Radius)
-	rowFrames[#rowFrames + 1] = f
-	return f
-end
-
-local function rowTitle(f, o, rightPad)
-	local hasDesc = o.Desc ~= nil and o.Desc ~= ""
-	local t = textLabel(f, {
-		Text = o.Name or "Element", Weight = Enum.FontWeight.SemiBold, TextSize = 15,
-		TextXAlignment = Enum.TextXAlignment.Left, TextTruncate = Enum.TextTruncate.AtEnd,
-		Position = UDim2.new(0, 16, 0, hasDesc and 8 or 0), Size = UDim2.new(1, -(rightPad + 16), 0, hasDesc and 20 or 54),
-	}, "Text")
-	if hasDesc then
-		textLabel(f, {
-			Text = o.Desc, TextSize = 12, TextXAlignment = Enum.TextXAlignment.Left, TextTruncate = Enum.TextTruncate.AtEnd,
-			Position = UDim2.new(0, 16, 0, 30), Size = UDim2.new(1, -(rightPad + 16), 0, 16),
-		}, "Sub")
+	table.clear(shortcuts)
+	table.clear(shortcutOrder)
+	if shortcutGui then
+		pcall(function() shortcutGui:Destroy() end)
+		shortcutGui = nil
 	end
-	return t
+	if windObj then
+		local w = windObj
+		windObj = nil
+		pcall(function() w:Destroy() end)
+	end
 end
 
-local function glossyKnob(parent, size)
-	local k = create("Frame", { Size = UDim2.fromOffset(size, size), BackgroundColor3 = WHITE, BorderSizePixel = 0, Parent = parent })
-	corner(k, math.floor(size / 2))
-	create("UIGradient", { Rotation = 90, Color = ColorSequence.new(WHITE, Color3.fromRGB(205, 218, 242)), Parent = k })
-	local ks = create("UIStroke", { Thickness = 2, Transparency = 0.25, Parent = k })
-	bind(ks, "Color", "Accent")
-	return k, ks
-end
-
-----------------------------------------------------------------
--- หัวข้อ / ข้อความ
-----------------------------------------------------------------
-function TabMeta:AddSection(name)
-	local f = create("Frame", { Size = UDim2.new(1, 0, 0, 30), BackgroundTransparency = 1, Parent = self.Page })
-	local bar = create("Frame", { Size = UDim2.new(0, 4, 0, 18), Position = UDim2.new(0, 2, 0.5, -9), BorderSizePixel = 0, Parent = f })
-	bind(bar, "BackgroundColor3", "Accent")
-	corner(bar, 2)
-	textLabel(f, { Text = name, Weight = Enum.FontWeight.Bold, TextSize = 16, TextXAlignment = Enum.TextXAlignment.Left, Position = UDim2.new(0, 14, 0, 0), Size = UDim2.new(1, -14, 1, 0) }, "Text")
-	return f
-end
-
-function TabMeta:AddLabel(text)
-	local l = textLabel(self.Page, {
-		Text = text, TextSize = 13, TextWrapped = true, TextXAlignment = Enum.TextXAlignment.Left, TextYAlignment = Enum.TextYAlignment.Top,
-		AutomaticSize = Enum.AutomaticSize.Y, Size = UDim2.new(1, 0, 0, 18),
-	}, "Sub")
-	local obj = {}
-	function obj:Set(t) l.Text = t end
-	return obj
-end
-
-----------------------------------------------------------------
--- ใช้ของ Wind UI โดยตรง: ปุ่ม / ช่องพิมพ์ / รายชื่อ (Dropdown)
-----------------------------------------------------------------
-function TabMeta:AddButton(o)
-	local el = self.Wind:Button({
-		Title = o.Name or "Button", Desc = o.Desc, Icon = o.Icon or "mouse-pointer-click",
-		Callback = function() safe(o.Callback) end,
-	})
-	local obj = { Element = el }
-	function obj:SetTitle(t) pcall(function() el:SetTitle(t) end) end
-	return obj
-end
-
-function TabMeta:AddTextbox(o)
-	local el = self.Wind:Input({
-		Title = o.Name or "Input", Desc = o.Desc, Placeholder = o.Placeholder or "พิมพ์ที่นี่...", Value = o.Default or "",
-		Type = o.Multiline and "Textarea" or "Input",
-		Callback = function(text)
-			if o.Flag then Library.Flags[o.Flag] = text end
-			safe(o.Callback, text, true)
-		end,
-	})
-	local obj = { Element = el }
-	function obj:Set(t) pcall(function() el:Set(t) end) end
-	function obj:Get() return el.Value end
-	return obj
-end
-
-function TabMeta:AddDropdown(o)
-	local el = self.Wind:Dropdown({
-		Title = o.Name or "Dropdown", Desc = o.Desc, Values = o.Options or {}, Value = o.Default,
-		Multi = o.Multi, AllowNone = o.AllowNone, SearchBarEnabled = o.Search,
-		Callback = function(v)
-			if o.Flag then Library.Flags[o.Flag] = v end
-			safe(o.Callback, v)
-		end,
-	})
-	if o.Flag and o.Default ~= nil then Library.Flags[o.Flag] = o.Default end
-	local obj = { Element = el }
-	function obj:Set(v) pcall(function() el:Select(v) end) end
-	function obj:Get() return el.Value end
-	function obj:Refresh(list) pcall(function() el:Refresh(list) end) end
-	return obj
-end
-
-----------------------------------------------------------------
--- สวิตช์ (สไตล์ตามภาพ) + ปุ่มลัดมือถือ/คีย์บอร์ด
-----------------------------------------------------------------
 local function captureKey(button, current, done)
 	Library.CapturingKey = true
 	button.Text = "..."
@@ -16608,12 +16448,12 @@ end
 
 local function makeKeycap(parent, x, key)
 	local btn = create("TextButton", {
-		Size = UDim2.fromOffset(42, 30), Position = UDim2.new(1, x, 0.5, -15), BorderSizePixel = 0, AutoButtonColor = false,
-		Text = "", FontFace = fnt(Enum.FontWeight.Bold), TextSize = 13, ZIndex = 3, Parent = parent,
+		Size = UDim2.fromOffset(42, 28), Position = UDim2.new(1, x, 0.5, -14), BorderSizePixel = 0, AutoButtonColor = false,
+		Text = "", Font = Enum.Font.GothamBold, TextSize = 12, ZIndex = 3, Parent = parent,
 	})
 	bind(btn, "BackgroundColor3", "Side")
 	bind(btn, "TextColor3", "Accent")
-	corner(btn, 9)
+	corner(btn, 8)
 	local st = create("UIStroke", { Thickness = 1.5, Transparency = 0.3, Parent = btn })
 	bind(st, "Color", "Accent")
 	local icon = iconLabel(btn, "keyboard", 18, "Accent", { Position = UDim2.new(0.5, -9, 0.5, -9), ZIndex = 4 })
@@ -16630,16 +16470,204 @@ local function makeKeycap(parent, x, key)
 	return btn, paint
 end
 
+local TabMeta = {}
+TabMeta.__index = TabMeta
+
+local function nextOrder(tab)
+	tab._order = tab._order + 1
+	tab._host = nil
+	return tab._order
+end
+
+local function elementHeight(o) return 38 end
+
+local function newElement(tab, height)
+	local f = create("Frame", { Size = UDim2.new(1, 0, 0, height), BorderSizePixel = 0, LayoutOrder = nextOrder(tab), Parent = tab.Page })
+	bind(f, "BackgroundColor3", "Element")
+	corner(f, 6)
+	return f
+end
+
+local function makeTitle(f, o, rightPad)
+	return textLabel(f, {
+		Text = o.Name or "Element", Font = Enum.Font.GothamBold, TextSize = 13,
+		TextXAlignment = Enum.TextXAlignment.Left, TextTruncate = Enum.TextTruncate.AtEnd,
+		Position = UDim2.new(0, 12, 0, 0), Size = UDim2.new(1, -(rightPad + 12), 1, 0),
+	}, "Text")
+end
+
+----------------------------------------------------------------
+-- [เพิ่ม] สะพาน Wind UI : เรียก Tab:Button / Toggle / Slider / Input / Colorpicker / ...
+-- ของ Wind UI ได้ในหน้าของ UI คุณ  (ตัว Wind ถูกซ่อนไว้ ดึงเฉพาะ element มาวางในหน้า)
+----------------------------------------------------------------
+local nativeNames = {
+	"Button", "Toggle", "Slider", "Input", "Dropdown", "Colorpicker", "Keybind", "ProgressBar",
+	"Section", "Group", "Space", "Divider", "HStack", "VStack", "Paragraph", "Image", "Code", "Video", "Viewport",
+}
+
+local function syncWindPos()
+	if not windObj or not Library.Gui or not Library.Window or not Library.Window.Main then return end
+	pcall(function()
+		local m = Library.Window.Main
+		local wm = windObj.UIElements.Main
+		local origin = WindUI.ScreenGui.AbsolutePosition
+		local p = m.AbsolutePosition + m.AbsoluteSize / 2 - origin
+		wm.Position = UDim2.fromOffset(p.X, p.Y)
+	end)
+end
+Library._syncWindPos = syncWindPos
+
+local function ensureWind()
+	if windObj then return windObj end
+	local W = Library._winW or 720
+	local H = Library._winH or 485
+	local ok, w = pcall(function()
+		return WindUI:CreateWindow({
+			Title = "RUOKHost", Folder = "RUOKHub", Size = UDim2.fromOffset(W, H),
+			MinSize = Vector2.new(100, 100), MaxSize = Vector2.new(3000, 3000),
+			Theme = WIND_THEME, Resizable = false, AutoScale = false, ScrollBarEnabled = false, HideSearchBar = true,
+			OpenButton = { Enabled = false }, Topbar = { Height = 52, ButtonsType = "Mac" },
+		})
+	end)
+	if not ok or not w then
+		warn("[RUOK UI] เปิด Wind UI ไม่สำเร็จ: " .. tostring(w))
+		return nil
+	end
+	windObj = w
+	pcall(function()
+		WindUI.ScreenGui.DisplayOrder = 1000
+		WindUI.DropdownGui.DisplayOrder = 1002
+		WindUI.TooltipGui.DisplayOrder = 1003
+		WindUI.NotificationGui.DisplayOrder = 1004
+		w.UIElements.Main.Visible = false
+	end)
+	-- ซ่อนหน้าตาของหน้าต่าง Wind (เหลือไว้เฉพาะชั้น Dialog สำหรับ Colorpicker ฯลฯ)
+	task.delay(1.5, function()
+		pcall(function()
+			local m = w.UIElements.Main
+			m.Active = false
+			for _, c in ipairs(m:GetChildren()) do
+				if c:IsA("GuiObject") and c.Name ~= "Main" then c.Visible = false end
+			end
+			local inner = m:FindFirstChild("Main")
+			if inner then
+				for _, c in ipairs(inner:GetChildren()) do
+					if c:IsA("GuiObject") then c.Visible = false end
+				end
+			end
+			m.Visible = true
+			syncWindPos()
+		end)
+	end)
+	return w
+end
+
+local function windHost(tab)
+	if tab._host then return tab._host end
+	local w = ensureWind()
+	if not w then return nil end
+	local ok, wt = pcall(function() return w:Tab({ Title = "host" .. tostring(math.floor(os.clock() * 1000)) }) end)
+	if not ok or not wt then return nil end
+	local cf = wt.UIElements.ContainerFrame
+	local order = nextOrder(tab)
+	local host = create("Frame", { Name = "WindHost", Size = UDim2.new(1, 0, 0, 10), BackgroundTransparency = 1, LayoutOrder = order, Parent = tab.Page })
+	for _, c in ipairs(cf:GetChildren()) do
+		if c:IsA("UIPadding") then
+			c.PaddingTop, c.PaddingBottom, c.PaddingLeft, c.PaddingRight = UDim.new(0, 0), UDim.new(0, 0), UDim.new(0, 0), UDim.new(0, 0)
+		end
+	end
+	cf.ScrollingEnabled = false
+	cf.AnchorPoint = Vector2.new(0, 0)
+	cf.Position = UDim2.new()
+	cf.Size = UDim2.fromScale(1, 1)
+	cf.Parent = host
+	local lay = cf:FindFirstChildOfClass("UIListLayout")
+	if lay then
+		host.Size = UDim2.new(1, 0, 0, lay.AbsoluteContentSize.Y)
+		lay:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+			host.Size = UDim2.new(1, 0, 0, lay.AbsoluteContentSize.Y)
+		end)
+	end
+	tab._host = { wt = wt, frame = host }
+	return tab._host
+end
+
+for _, name in ipairs(nativeNames) do
+	TabMeta[name] = function(self, o)
+		local h = windHost(self)
+		if not h then
+			warn("[RUOK UI] ใช้ Wind element ไม่ได้: " .. name)
+			return nil
+		end
+		local fn = h.wt[name]
+		if not fn then
+			warn("[RUOK UI] Wind UI เวอร์ชันนี้ไม่มี element: " .. name)
+			return nil
+		end
+		return fn(h.wt, o)
+	end
+end
+
+function TabMeta:WindTab()
+	local h = windHost(self)
+	return h and h.wt or nil
+end
+
+function TabMeta:AddSection(name)
+	local f = create("Frame", { Size = UDim2.new(1, 0, 0, 24), BackgroundTransparency = 1, LayoutOrder = nextOrder(self), Parent = self.Page })
+	local bar = create("Frame", { Size = UDim2.new(0, 3, 0, 14), Position = UDim2.new(0, 0, 0.5, -7), BorderSizePixel = 0, Parent = f })
+	bind(bar, "BackgroundColor3", "Accent")
+	corner(bar, 2)
+	textLabel(f, { Text = name, Font = Enum.Font.GothamBold, TextSize = 13, TextXAlignment = Enum.TextXAlignment.Left, Position = UDim2.new(0, 10, 0, 0), Size = UDim2.new(1, -10, 1, 0) }, "Text")
+end
+
+function TabMeta:AddLabel(text)
+	local l = textLabel(self.Page, {
+		Text = text, TextSize = 12, TextWrapped = true, TextXAlignment = Enum.TextXAlignment.Left,
+		AutomaticSize = Enum.AutomaticSize.Y, Size = UDim2.new(1, 0, 0, 18), LayoutOrder = nextOrder(self),
+	}, "Sub")
+	local obj = {}
+	function obj:Set(t) l.Text = t end
+	return obj
+end
+
+function TabMeta:AddButton(o)
+	local f = newElement(self, elementHeight(o))
+	makeTitle(f, o, 36)
+	textLabel(f, { Text = "›", Font = Enum.Font.GothamBold, TextSize = 22, Position = UDim2.new(1, -30, 0, 0), Size = UDim2.new(0, 20, 1, 0) }, "Accent")
+	local flash = create("Frame", { Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1, BorderSizePixel = 0, Parent = f })
+	bind(flash, "BackgroundColor3", "Accent")
+	corner(flash, 6)
+	local b = create("TextButton", { Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1, Text = "", Parent = f })
+	b.MouseButton1Click:Connect(function()
+		flash.BackgroundTransparency = 0.65
+		tween(flash, { BackgroundTransparency = 1 }, 0.35)
+		safe(o.Callback)
+	end)
+end
+
 function TabMeta:AddToggle(o)
 	local state = o.Default == true
 	local hasShortcut = (o.Shortcut ~= nil and o.Shortcut ~= false)
-	local f = newRow(self, o.Desc and 62 or 54)
+	local hasDesc = o.Desc ~= nil and o.Desc ~= ""
+	local f = newElement(self, hasDesc and 58 or 50)
 	local showKeycap = hasShortcut and UIS.KeyboardEnabled
 	local rightPad = 84
 	if showKeycap then rightPad = 134 end
-	rowTitle(f, o, rightPad)
+	textLabel(f, {
+		Text = o.Name or "Element", Font = Enum.Font.GothamBold, TextSize = 13, TextXAlignment = Enum.TextXAlignment.Left,
+		TextTruncate = Enum.TextTruncate.AtEnd, Position = UDim2.new(0, 12, 0, hasDesc and 8 or 0),
+		Size = UDim2.new(1, -(rightPad + 12), 0, hasDesc and 20 or 50),
+	}, "Text")
+	if hasDesc then
+		textLabel(f, {
+			Text = o.Desc, Font = Enum.Font.Gotham, TextSize = 11, TextXAlignment = Enum.TextXAlignment.Left, TextTruncate = Enum.TextTruncate.AtEnd,
+			Position = UDim2.new(0, 12, 0, 28), Size = UDim2.new(1, -(rightPad + 12), 0, 16),
+		}, "Sub")
+	end
 
-	local sw = create("Frame", { Size = UDim2.fromOffset(64, 32), Position = UDim2.new(1, -78, 0.5, -16), BorderSizePixel = 0, Parent = f })
+	-- สวิตช์สไตล์ในภาพ: แคปซูลกระจก + ไอคอนเพาเวอร์ + ปุ่มกลมมันวาว
+	local sw = create("Frame", { Size = UDim2.fromOffset(64, 32), Position = UDim2.new(1, -76, 0.5, -16), BorderSizePixel = 0, Parent = f })
 	bind(sw, "BackgroundColor3", "Stroke")
 	corner(sw, 16)
 	local glow = create("UIStroke", { Thickness = 2, Transparency = state and 0.2 or 0.8, Parent = sw })
@@ -16647,10 +16675,12 @@ function TabMeta:AddToggle(o)
 	local fill = create("Frame", { Size = UDim2.fromScale(1, 1), BackgroundColor3 = WHITE, BackgroundTransparency = state and 0 or 1, BorderSizePixel = 0, Parent = sw })
 	corner(fill, 16)
 	bars[#bars + 1] = create("UIGradient", { Color = ColorSequence.new(Theme.Accent, Theme.Accent2), Parent = fill })
-	local power = iconLabel(sw, "power", 16, nil, { ImageColor3 = WHITE, ImageTransparency = 0.05, Position = state and UDim2.fromOffset(10, 8) or UDim2.fromOffset(38, 8), ZIndex = 2 })
-	local knob = glossyKnob(sw, 24)
-	knob.Position = state and UDim2.fromOffset(36, 4) or UDim2.fromOffset(4, 4)
-	knob.ZIndex = 3
+	local power = iconLabel(sw, "power", 16, nil, { ImageColor3 = WHITE, Position = state and UDim2.fromOffset(10, 8) or UDim2.fromOffset(38, 8), ZIndex = 2 })
+	local knob = create("Frame", { Size = UDim2.fromOffset(24, 24), Position = state and UDim2.fromOffset(36, 4) or UDim2.fromOffset(4, 4), BackgroundColor3 = WHITE, BorderSizePixel = 0, ZIndex = 3, Parent = sw })
+	corner(knob, 12)
+	create("UIGradient", { Rotation = 90, Color = ColorSequence.new(WHITE, Color3.fromRGB(205, 218, 242)), Parent = knob })
+	local ks = create("UIStroke", { Thickness = 2, Transparency = 0.25, Parent = knob })
+	bind(ks, "Color", "Accent")
 
 	local hit = create("TextButton", { Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1, Text = "", ZIndex = 2, Parent = f })
 	if o.Flag then Library.Flags[o.Flag] = state end
@@ -16659,12 +16689,12 @@ function TabMeta:AddToggle(o)
 	if hasShortcut then
 		local so = type(o.Shortcut) == "table" and o.Shortcut or {}
 		sc = Library:CreateShortcut({
-			Id = so.Id or o.Flag or o.Name, Name = so.Name or o.Name, Key = so.Key, Icon = so.Icon,
+			Id = so.Id or o.Flag or o.Name, Name = so.Name or o.Name, Desc = so.Desc, Key = so.Key, Icon = so.Icon,
 			Mode = so.Mode or "Action", Callback = so.Callback or o.OnShortcut,
 			OnKeyChanged = function(k) if paintKey then paintKey(k) end end,
 		})
 		if showKeycap then
-			keycap, paintKey = makeKeycap(f, -130, sc.Key)
+			keycap, paintKey = makeKeycap(f, -126, sc.Key)
 			keycap.MouseButton1Click:Connect(function()
 				captureKey(keycap, sc.Key, function(k)
 					sc:SetKey(k)
@@ -16693,19 +16723,17 @@ function TabMeta:AddToggle(o)
 	return obj
 end
 
-----------------------------------------------------------------
--- สไลเดอร์ (สไตล์ตามภาพ: แคปซูลกระจก + หลอดเรืองแสง + ปุ่มกลมมันวาว)
-----------------------------------------------------------------
 function TabMeta:AddSlider(o)
 	local min, max, inc = o.Min or 0, o.Max or 100, o.Increment or 1
 	local value = math.clamp(o.Default or min, min, max)
-	local f = newRow(self, 76)
-	textLabel(f, { Text = o.Name or "Slider", Weight = Enum.FontWeight.SemiBold, TextSize = 15, TextXAlignment = Enum.TextXAlignment.Left, TextTruncate = Enum.TextTruncate.AtEnd, Position = UDim2.new(0, 16, 0, 8), Size = UDim2.new(0.6, -16, 0, 20) }, "Text")
-	local vl = textLabel(f, { TextSize = 14, Weight = Enum.FontWeight.Bold, TextXAlignment = Enum.TextXAlignment.Right, Position = UDim2.new(0.6, 0, 0, 8), Size = UDim2.new(0.4, -16, 0, 20) }, "Accent")
+	local f = newElement(self, 76)
+	textLabel(f, { Text = o.Name or "Slider", Font = Enum.Font.GothamBold, TextXAlignment = Enum.TextXAlignment.Left, TextTruncate = Enum.TextTruncate.AtEnd, Position = UDim2.new(0, 12, 0, 8), Size = UDim2.new(0.6, 0, 0, 20) }, "Text")
+	local vl = textLabel(f, { TextSize = 13, Font = Enum.Font.GothamBold, TextXAlignment = Enum.TextXAlignment.Right, Position = UDim2.new(0.6, 0, 0, 8), Size = UDim2.new(0.4, -12, 0, 20) }, "Accent")
 
-	local capsule = create("Frame", { Position = UDim2.new(0, 12, 0, 34), Size = UDim2.new(1, -24, 0, 32), BorderSizePixel = 0, Parent = f })
+	-- สไลเดอร์สไตล์ในภาพ: แคปซูลกระจก + ประกาย 2 ข้าง + หลอดเรืองแสง + ปุ่มกลมมันวาว
+	local capsule = create("Frame", { Position = UDim2.new(0, 10, 0, 34), Size = UDim2.new(1, -20, 0, 34), BorderSizePixel = 0, Parent = f })
 	bind(capsule, "BackgroundColor3", "Side")
-	corner(capsule, 16)
+	corner(capsule, 17)
 	local cs = create("UIStroke", { Thickness = 1.5, Transparency = 0.2, Parent = capsule })
 	bind(cs, "Color", "Stroke")
 	create("UIGradient", { Rotation = 90, Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0), NumberSequenceKeypoint.new(1, 0.2) }), Parent = capsule })
@@ -16718,10 +16746,13 @@ function TabMeta:AddSlider(o)
 	local fill = create("Frame", { Size = UDim2.new(0, 0, 1, 0), BackgroundColor3 = WHITE, BorderSizePixel = 0, Parent = bar })
 	corner(fill, 5)
 	bars[#bars + 1] = create("UIGradient", { Color = ColorSequence.new(Theme.Accent, Theme.Accent2), Parent = fill })
-	local fillGlow = create("UIStroke", { Thickness = 1.5, Transparency = 0.55, Parent = fill })
-	bind(fillGlow, "Color", "Accent2")
-	local knob = glossyKnob(bar, 24)
-	knob.ZIndex = 3
+	local fg = create("UIStroke", { Thickness = 1.5, Transparency = 0.55, Parent = fill })
+	bind(fg, "Color", "Accent2")
+	local knob = create("Frame", { Size = UDim2.fromOffset(24, 24), BackgroundColor3 = WHITE, BorderSizePixel = 0, ZIndex = 3, Parent = bar })
+	corner(knob, 12)
+	create("UIGradient", { Rotation = 90, Color = ColorSequence.new(WHITE, Color3.fromRGB(205, 218, 242)), Parent = knob })
+	local ks = create("UIStroke", { Thickness = 2, Transparency = 0.25, Parent = knob })
+	bind(ks, "Color", "Accent")
 	local hit = create("TextButton", { Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1, Text = "", ZIndex = 4, Parent = capsule })
 
 	local obj = {}
@@ -16729,8 +16760,7 @@ function TabMeta:AddSlider(o)
 		x = math.clamp(math.floor((x - min) / inc + 0.5) * inc + min, min, max)
 		x = tonumber(string.format("%.4f", x))
 		value = x
-		local a = 0
-		if max ~= min then a = (x - min) / (max - min) end
+		local a = (max == min) and 0 or (x - min) / (max - min)
 		fill.Size = UDim2.new(a, 0, 1, 0)
 		knob.Position = UDim2.new(a, -12, 0.5, -12)
 		vl.Text = tostring(x) .. (o.Suffix or "")
@@ -16741,6 +16771,7 @@ function TabMeta:AddSlider(o)
 	function obj:Get() return value end
 	setValue(value, true)
 
+	-- ใช้ตัวแปรแยกอิสระเฉพาะ Slider ตัวนี้ ป้องกันการลากแล้วไปปนกัน
 	local sliding = false
 	local function fromInput(pos)
 		local a = math.clamp((pos.X - bar.AbsolutePosition.X) / math.max(bar.AbsoluteSize.X, 1), 0, 1)
@@ -16765,39 +16796,129 @@ function TabMeta:AddSlider(o)
 	return obj
 end
 
-----------------------------------------------------------------
--- ปุ่มคีย์ (ตั้งปุ่มคีย์บอร์ด)  — ใช้ได้เฉพาะอุปกรณ์ที่มีคีย์บอร์ด
-----------------------------------------------------------------
+function TabMeta:AddDropdown(o)
+	local options = o.Options or {}
+	local current = o.Default
+	local open = false
+	local f = newElement(self, 38)
+	f.ClipsDescendants = true
+	local head = create("TextButton", { Size = UDim2.new(1, 0, 0, 38), BackgroundTransparency = 1, Text = "", Parent = f })
+	textLabel(head, { Text = o.Name or "Dropdown", Font = Enum.Font.GothamBold, TextXAlignment = Enum.TextXAlignment.Left, Position = UDim2.new(0, 12, 0, 0), Size = UDim2.new(0.5, -12, 1, 0) }, "Text")
+	local val = textLabel(head, { Text = current ~= nil and tostring(current) or "เลือก...", TextSize = 12, TextXAlignment = Enum.TextXAlignment.Right, TextTruncate = Enum.TextTruncate.AtEnd, Position = UDim2.new(0.5, 0, 0, 0), Size = UDim2.new(0.5, -34, 1, 0) }, "Accent")
+	local arrow = textLabel(head, { Text = "▼", TextSize = 10, Position = UDim2.new(1, -28, 0, 0), Size = UDim2.fromOffset(20, 38) }, "Sub")
+	local list = create("ScrollingFrame", {
+		Position = UDim2.fromOffset(8, 44), Size = UDim2.new(1, -16, 0, 0), BackgroundTransparency = 1, BorderSizePixel = 0,
+		ScrollBarThickness = 3, CanvasSize = UDim2.new(), AutomaticCanvasSize = Enum.AutomaticSize.Y, Parent = f,
+	})
+	bind(list, "ScrollBarImageColor3", "Accent")
+	create("UIListLayout", { Padding = UDim.new(0, 4), SortOrder = Enum.SortOrder.LayoutOrder, Parent = list })
+
+	local entries = {}
+	local function listHeight()
+		local n = math.min(#options, 5)
+		return n * 30 + math.max(n - 1, 0) * 4
+	end
+	local function resize()
+		tween(f, { Size = UDim2.new(1, 0, 0, open and (44 + listHeight() + 8) or 38) }, 0.2)
+		tween(list, { Size = UDim2.new(1, -16, 0, listHeight()) }, 0.2)
+		tween(arrow, { Rotation = open and 180 or 0 }, 0.2)
+	end
+	local function paint()
+		for _, e in ipairs(entries) do e.btn.TextColor3 = (e.opt == current) and Theme.Accent or Theme.Text end
+	end
+	table.insert(themeListeners, paint)
+
+	local obj = {}
+	local function choose(opt, silent)
+		current = opt
+		val.Text = tostring(opt)
+		paint()
+		open = false
+		resize()
+		if o.Flag then Library.Flags[o.Flag] = opt end
+		if not silent then safe(o.Callback, opt) end
+	end
+	local function rebuild()
+		for _, e in ipairs(entries) do e.btn:Destroy() end
+		table.clear(entries)
+		for i, opt in ipairs(options) do
+			local b = create("TextButton", {
+				Size = UDim2.new(1, -6, 0, 30), BorderSizePixel = 0, Text = tostring(opt), Font = Enum.Font.GothamMedium,
+				TextSize = 12, AutoButtonColor = false, LayoutOrder = i, Parent = list,
+			})
+			bind(b, "BackgroundColor3", "Side")
+			corner(b, 5)
+			b.MouseButton1Click:Connect(function() choose(opt) end)
+			entries[#entries + 1] = { opt = opt, btn = b }
+		end
+		paint()
+	end
+	rebuild()
+	head.MouseButton1Click:Connect(function()
+		open = not open
+		resize()
+	end)
+	function obj:Set(v, silent) choose(v, silent) end
+	function obj:Get() return current end
+	function obj:Refresh(newOptions, keep)
+		options = newOptions or {}
+		if not keep then current = nil val.Text = "เลือก..." end
+		rebuild()
+		if open then resize() end
+	end
+	if o.Flag and current ~= nil then Library.Flags[o.Flag] = current end
+	return obj
+end
+
+function TabMeta:AddTextbox(o)
+	local f = newElement(self, elementHeight(o))
+	makeTitle(f, o, 180)
+	local box = create("TextBox", {
+		Size = UDim2.fromOffset(160, 26), Position = UDim2.new(1, -172, 0.5, -13), BorderSizePixel = 0,
+		Text = o.Default or "", PlaceholderText = o.Placeholder or "พิมพ์ที่นี่...", ClearTextOnFocus = false,
+		Font = Enum.Font.GothamMedium, TextSize = 12, Parent = f,
+	})
+	bind(box, "BackgroundColor3", "Side")
+	bind(box, "TextColor3", "Text")
+	bind(box, "PlaceholderColor3", "Sub")
+	corner(box, 5)
+	box.FocusLost:Connect(function(enter)
+		if o.Flag then Library.Flags[o.Flag] = box.Text end
+		safe(o.Callback, box.Text, enter)
+	end)
+	local obj = {}
+	function obj:Set(t) box.Text = t end
+	function obj:Get() return box.Text end
+	return obj
+end
+
 function TabMeta:AddKeybind(o)
 	local key = o.Default or Enum.KeyCode.F
-	local f = newRow(self, o.Desc and 62 or 54)
-	rowTitle(f, o, 130)
+	local listening = false
+	local f = newElement(self, elementHeight(o))
+	makeTitle(f, o, 110)
 	local btn = create("TextButton", {
-		Size = UDim2.fromOffset(104, 32), Position = UDim2.new(1, -118, 0.5, -16), BorderSizePixel = 0, AutoButtonColor = false,
-		FontFace = fnt(Enum.FontWeight.Bold), TextSize = 14, Text = key.Name, Parent = f,
+		Size = UDim2.fromOffset(90, 24), Position = UDim2.new(1, -102, 0.5, -12), BorderSizePixel = 0,
+		Font = Enum.Font.GothamBold, TextSize = 12, Text = key.Name, AutoButtonColor = false, Parent = f,
 	})
 	bind(btn, "BackgroundColor3", "Side")
 	bind(btn, "TextColor3", "Accent")
-	corner(btn, 9)
-	local st = create("UIStroke", { Thickness = 1.5, Transparency = 0.3, Parent = btn })
-	bind(st, "Color", "Accent")
-	if not UIS.KeyboardEnabled then
-		btn.Text = "ต้องใช้คีย์บอร์ด"
-		btn.TextSize = 11
-	end
+	corner(btn, 5)
 	btn.MouseButton1Click:Connect(function()
-		if not UIS.KeyboardEnabled then return end
-		captureKey(btn, key, function(k)
-			if k then
-				key = k
-				safe(o.Changed, key)
-			end
-			btn.Text = key.Name
-		end)
+		listening = true
+		btn.Text = "..."
 	end)
 	track(UIS.InputBegan:Connect(function(input, gp)
-		if gp or Library.CapturingKey then return end
-		if input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode == key then
+		if listening then
+			if input.UserInputType == Enum.UserInputType.Keyboard then
+				listening = false
+				if input.KeyCode ~= Enum.KeyCode.Escape then
+					key = input.KeyCode
+					safe(o.Changed, key)
+				end
+				btn.Text = key.Name
+			end
+		elseif not gp and input.KeyCode == key then
 			safe(o.Callback, key)
 		end
 	end))
@@ -16807,92 +16928,62 @@ function TabMeta:AddKeybind(o)
 	return obj
 end
 
-----------------------------------------------------------------
--- ตัวปรับสี (ใหญ่ขึ้น + แสดงโค้ดสี + ปุ่มบันทึกโค้ดสี = คัดลอกลงคลิปบอร์ด)
-----------------------------------------------------------------
 function TabMeta:AddColorPicker(o)
 	local color = o.Default or Color3.fromRGB(0, 170, 255)
 	local h, s, v = color:ToHSV()
-	local f = newRow(self, 318)
+	local f = newElement(self, 195)
 	f.ClipsDescendants = true
+	
+	textLabel(f, { Text = o.Name or "Color", Font = Enum.Font.GothamBold, TextSize = 13, TextXAlignment = Enum.TextXAlignment.Left, Position = UDim2.new(0, 12, 0, 8), Size = UDim2.new(1, -24, 0, 18) }, "Text")
 
-	textLabel(f, { Text = o.Name or "Color", Weight = Enum.FontWeight.Bold, TextSize = 15, TextXAlignment = Enum.TextXAlignment.Left, Position = UDim2.new(0, 16, 0, 10), Size = UDim2.new(1, -32, 0, 20) }, "Text")
-
-	local sv = create("Frame", { Position = UDim2.fromOffset(16, 40), Size = UDim2.new(1, -66, 0, 120), BorderSizePixel = 0, Parent = f })
-	corner(sv, 8)
+	local sv = create("Frame", { Position = UDim2.fromOffset(12, 34), Size = UDim2.new(1, -64, 0, 110), BorderSizePixel = 0, Parent = f })
+	corner(sv, 4)
 	local white = create("Frame", { Size = UDim2.fromScale(1, 1), BackgroundColor3 = WHITE, BorderSizePixel = 0, Parent = sv })
-	corner(white, 8)
+	corner(white, 4)
 	create("UIGradient", { Transparency = NumberSequence.new(0, 1), Parent = white })
 	local blackF = create("Frame", { Size = UDim2.fromScale(1, 1), BackgroundColor3 = BLACK, BorderSizePixel = 0, Parent = sv })
-	corner(blackF, 8)
+	corner(blackF, 4)
 	create("UIGradient", { Rotation = 90, Transparency = NumberSequence.new(1, 0), Parent = blackF })
-	local cursor = create("Frame", { Size = UDim2.fromOffset(14, 14), BackgroundTransparency = 1, Parent = sv })
-	corner(cursor, 7)
-	create("UIStroke", { Thickness = 2.5, Color = WHITE, Parent = cursor })
+	local cursor = create("Frame", { Size = UDim2.fromOffset(10, 10), BackgroundTransparency = 1, Parent = sv })
+	corner(cursor, 5)
+	create("UIStroke", { Thickness = 2, Color = WHITE, Parent = cursor })
 
-	local hueBar = create("Frame", { Position = UDim2.new(1, -44, 0, 40), Size = UDim2.fromOffset(28, 120), BackgroundColor3 = WHITE, BorderSizePixel = 0, Parent = f })
-	corner(hueBar, 8)
+	local hueBar = create("Frame", { Position = UDim2.new(1, -44, 0, 34), Size = UDim2.fromOffset(22, 110), BackgroundColor3 = WHITE, BorderSizePixel = 0, Parent = f })
+	corner(hueBar, 4)
 	local kps = {}
 	for i = 0, 6 do kps[#kps + 1] = ColorSequenceKeypoint.new(i / 6, Color3.fromHSV((i % 6) / 6, 1, 1)) end
 	create("UIGradient", { Rotation = 90, Color = ColorSequence.new(kps), Parent = hueBar })
-	local hueMark = create("Frame", { Size = UDim2.new(1, 6, 0, 6), BackgroundColor3 = WHITE, BorderSizePixel = 0, Parent = hueBar })
-	corner(hueMark, 3)
-	create("UIStroke", { Thickness = 1.5, Color = BLACK, Parent = hueMark })
-
-	-- สีปัจจุบัน (ใหญ่) + โค้ดสี
-	local cur = create("Frame", { Position = UDim2.fromOffset(16, 170), Size = UDim2.new(1, -32, 0, 46), BorderSizePixel = 0, Parent = f })
-	corner(cur, 10)
-	local curStroke = create("UIStroke", { Thickness = 2, Transparency = 0.2, Parent = cur })
-	bind(curStroke, "Color", "Stroke")
-	local curTitle = textLabel(cur, { Text = "สีปัจจุบัน", TextSize = 11, Weight = Enum.FontWeight.SemiBold, TextXAlignment = Enum.TextXAlignment.Left, Position = UDim2.fromOffset(12, 5), Size = UDim2.new(0.5, 0, 0, 14) })
-	local curCode = textLabel(cur, { Text = "#000000", TextSize = 20, Weight = Enum.FontWeight.Bold, TextXAlignment = Enum.TextXAlignment.Left, Position = UDim2.fromOffset(12, 19), Size = UDim2.new(1, -24, 0, 24) })
-
-	local info = textLabel(f, { Text = "", TextSize = 12, TextXAlignment = Enum.TextXAlignment.Left, Position = UDim2.fromOffset(18, 222), Size = UDim2.new(1, -36, 0, 16) }, "Sub")
+	local hueMark = create("Frame", { Size = UDim2.new(1, 4, 0, 4), BackgroundColor3 = WHITE, BorderSizePixel = 0, Parent = hueBar })
+	create("UIStroke", { Thickness = 1, Color = BLACK, Parent = hueMark })
 
 	local hexBox = create("TextBox", {
-		Size = UDim2.new(1, -32, 0, 34), Position = UDim2.fromOffset(16, 244), BorderSizePixel = 0,
-		Text = hexStr(color), PlaceholderText = "#RRGGBB หรือ R,G,B", ClearTextOnFocus = false,
-		FontFace = fnt(Enum.FontWeight.SemiBold), TextSize = 14, Parent = f,
+		Size = UDim2.new(0.55, 0, 0, 28), Position = UDim2.new(0, 12, 0, 153), BorderSizePixel = 0,
+		Text = hexStr(color), PlaceholderText = "#RRGGBB หรือ R,G,B", Font = Enum.Font.GothamMedium, TextSize = 12, Parent = f,
 	})
 	bind(hexBox, "BackgroundColor3", "Side")
 	bind(hexBox, "TextColor3", "Text")
 	bind(hexBox, "PlaceholderColor3", "Sub")
-	corner(hexBox, 9)
+	corner(hexBox, 5)
 
 	local saveCodeBtn = create("TextButton", {
-		Size = UDim2.new(0.5, -20, 0, 30), Position = UDim2.new(0, 16, 0, 284), BorderSizePixel = 0,
-		Text = "บันทึกโค้ดสี (HEX)", FontFace = fnt(Enum.FontWeight.Bold), TextSize = 13, AutoButtonColor = false, Parent = f,
+		Size = UDim2.new(0.38, 0, 0, 28), Position = UDim2.new(0.58, 4, 0, 153), BorderSizePixel = 0,
+		Text = "บันทึกโค้ดสี", Font = Enum.Font.GothamBold, TextSize = 12, AutoButtonColor = false, Parent = f,
 	})
 	bind(saveCodeBtn, "BackgroundColor3", "Accent")
 	bind(saveCodeBtn, "TextColor3", "OnAccent")
-	corner(saveCodeBtn, 9)
-	local copyRgbBtn = create("TextButton", {
-		Size = UDim2.new(0.5, -20, 0, 30), Position = UDim2.new(0.5, 4, 0, 284), BorderSizePixel = 0,
-		Text = "คัดลอก RGB", FontFace = fnt(Enum.FontWeight.Bold), TextSize = 13, AutoButtonColor = false, Parent = f,
-	})
-	bind(copyRgbBtn, "BackgroundColor3", "Side")
-	bind(copyRgbBtn, "TextColor3", "Accent")
-	corner(copyRgbBtn, 9)
-	local crs = create("UIStroke", { Thickness = 1.5, Transparency = 0.3, Parent = copyRgbBtn })
-	bind(crs, "Color", "Accent")
+	corner(saveCodeBtn, 5)
 
 	local obj = {}
 	local function update(silent)
 		color = Color3.fromHSV(h, s, v)
 		sv.BackgroundColor3 = Color3.fromHSV(h, 1, 1)
-		cursor.Position = UDim2.new(s, -7, 1 - v, -7)
-		hueMark.Position = UDim2.new(0, -3, h, -3)
+		cursor.Position = UDim2.new(s, -5, 1 - v, -5)
+		hueMark.Position = UDim2.new(0, -2, h, -2)
 		hexBox.Text = hexStr(color)
-		cur.BackgroundColor3 = color
-		local dark = lum(color) < 0.55
-		local tc = dark and WHITE or Color3.fromRGB(20, 24, 32)
-		curTitle.TextColor3 = tc
-		curCode.TextColor3 = tc
-		curCode.Text = hexStr(color)
-		info.Text = string.format("RGB  %s    HSV  %d°, %d%%, %d%%", rgbStr(color), math.floor(h * 360 + 0.5), math.floor(s * 100 + 0.5), math.floor(v * 100 + 0.5))
 		if o.Flag then Library.Flags[o.Flag] = color end
 		if not silent then safe(o.Callback, color) end
 	end
+
 	function obj:Set(c, silent)
 		h, s, v = c:ToHSV()
 		update(silent)
@@ -16905,101 +16996,81 @@ function TabMeta:AddColorPicker(o)
 		v = 1 - math.clamp((pos.Y - sv.AbsolutePosition.Y) / math.max(sv.AbsoluteSize.Y, 1), 0, 1)
 		update()
 	end, self.Page)
+	
 	dragInput(hueBar, function(pos)
 		h = math.clamp((pos.Y - hueBar.AbsolutePosition.Y) / math.max(hueBar.AbsoluteSize.Y, 1), 0, 1)
 		update()
 	end, self.Page)
 
 	hexBox.FocusLost:Connect(function()
-		local c = parseColor(hexBox.Text)
-		if c then
-			h, s, v = c:ToHSV()
+		local text = hexBox.Text:gsub("%s+", "")
+		local r, g, b = text:match("(%d+),(%d+),(%d+)")
+		if r and g and b then
+			local newC = Color3.fromRGB(tonumber(r), tonumber(g), tonumber(b))
+			h, s, v = newC:ToHSV()
 			update()
-		else
-			hexBox.Text = hexStr(color)
+		elseif text:sub(1,1) == "#" and #text == 7 then
+			local hexNum = tonumber(text:sub(2), 16)
+			if hexNum then
+				local newC = Color3.fromRGB(math.floor(hexNum / 65536), math.floor((hexNum / 256) % 256), hexNum % 256)
+				h, s, v = newC:ToHSV()
+				update()
+			end
 		end
 	end)
 
-	local function copyWith(text, label)
-		local ok = copyText(text)
-		if ok then
-			Library:Notify({ Title = "คัดลอก" .. label .. "แล้ว!", Text = "คัดลอก " .. text .. " ลงคลิปบอร์ดสำเร็จ", Duration = 3 })
-		else
-			Library:Notify({ Title = "โค้ดสี", Text = text .. "  (อุปกรณ์นี้ไม่รองรับการคัดลอกอัตโนมัติ)", Duration = 4 })
+	-- แก้ไขปุ่มบันทึกโค้ดสี ให้ทำการคัดลอกโค้ดสี (Copy to Clipboard) และไม่เด้งแป้นพิมพ์ค้าง
+	saveCodeBtn.MouseButton1Click:Connect(function()
+		local code = hexBox.Text
+		if setclipboard then
+			pcall(function() setclipboard(code) end)
 		end
-	end
-	saveCodeBtn.MouseButton1Click:Connect(function() copyWith(hexStr(color), "โค้ดสี") end)
-	copyRgbBtn.MouseButton1Click:Connect(function() copyWith(rgbStr(color), " RGB ") end)
+		Library:Notify({ Title = "คัดลอกโค้ดสีแล้ว!", Text = "คัดลอก " .. code .. " ลงคลิปบอร์ดสำเร็จ" })
+	end)
+
 	return obj
 end
 
-----------------------------------------------------------------
--- ตัวอย่างสด (Mini Preview)
-----------------------------------------------------------------
+-- ตัวอย่างสด (Mini Preview) จำลอง UI จริงย่อส่วน
 function TabMeta:AddPreview()
-	local f = newRow(self, 168)
-	local miniUI = create("Frame", { Position = UDim2.fromOffset(12, 12), Size = UDim2.new(1, -24, 1, -24), BorderSizePixel = 0, ClipsDescendants = true, Parent = f })
+	local f = newElement(self, 140)
+	local miniUI = create("Frame", { Position = UDim2.fromOffset(12, 10), Size = UDim2.new(1, -24, 1, -20), BorderSizePixel = 0, ClipsDescendants = true, Parent = f })
 	bind(miniUI, "BackgroundColor3", "Main")
-	corner(miniUI, 10)
-	local miniStroke = create("UIStroke", { Thickness = 2, Color = WHITE, Parent = miniUI })
+	corner(miniUI, 6)
+	local miniStroke = create("UIStroke", { Thickness = 1.5, Color = WHITE, Parent = miniUI })
 	spinners[#spinners + 1] = create("UIGradient", { Color = ringSequence(), Parent = miniStroke })
 
-	local mSide = create("Frame", { Size = UDim2.new(0, 64, 1, 0), BorderSizePixel = 0, Parent = miniUI })
+	local mSide = create("Frame", { Size = UDim2.new(0, 55, 1, 0), BorderSizePixel = 0, Parent = miniUI })
 	bind(mSide, "BackgroundColor3", "Side")
-	for i = 1, 4 do
-		local r = create("Frame", { Position = UDim2.fromOffset(8, 10 + (i - 1) * 20), Size = UDim2.new(1, -16, 0, 14), BorderSizePixel = 0, Parent = mSide })
+	for i = 1, 3 do
+		local r = create("Frame", { Position = UDim2.fromOffset(6, 6 + (i - 1) * 16), Size = UDim2.new(1, -12, 0, 12), BorderSizePixel = 0, Parent = mSide })
 		bind(r, "BackgroundColor3", i == 1 and "Accent" or "Element")
-		corner(r, 4)
+		corner(r, 3)
 	end
 
-	local mHead = create("Frame", { Position = UDim2.fromOffset(64, 0), Size = UDim2.new(1, -64, 0, 28), BackgroundTransparency = 1, Parent = miniUI })
-	textLabel(mHead, { Text = "UI Preview", Weight = Enum.FontWeight.Bold, TextSize = 12, TextXAlignment = Enum.TextXAlignment.Left, Position = UDim2.fromOffset(10, 0), Size = UDim2.new(1, -10, 1, 0) }, "Accent")
+	local mHead = create("Frame", { Position = UDim2.fromOffset(55, 0), Size = UDim2.new(1, -55, 0, 24), BackgroundTransparency = 1, Parent = miniUI })
+	textLabel(mHead, { Text = "UI Preview", Font = Enum.Font.GothamBold, TextSize = 10, TextXAlignment = Enum.TextXAlignment.Left, Position = UDim2.fromOffset(6, 4), Size = UDim2.new(1, -6, 1, 0) }, "Text")
 
-	local mContent = create("Frame", { Position = UDim2.fromOffset(72, 32), Size = UDim2.new(1, -80, 1, -38), BackgroundTransparency = 1, Parent = miniUI })
-	local mBtn = create("Frame", { Size = UDim2.new(1, 0, 0, 22), BorderSizePixel = 0, Parent = mContent })
+	local mContent = create("Frame", { Position = UDim2.fromOffset(61, 28), Size = UDim2.new(1, -67, 1, -32), BackgroundTransparency = 1, Parent = miniUI })
+	local mBtn = create("Frame", { Size = UDim2.new(1, -6, 0, 18), BorderSizePixel = 0, Parent = mContent })
 	bind(mBtn, "BackgroundColor3", "Accent")
-	corner(mBtn, 6)
-	textLabel(mBtn, { Text = "Sample Button", Weight = Enum.FontWeight.Bold, TextSize = 11, Size = UDim2.fromScale(1, 1) }, "OnAccent")
+	corner(mBtn, 3)
+	textLabel(mBtn, { Text = "Sample Element", Font = Enum.Font.GothamBold, TextSize = 8, Size = UDim2.fromScale(1, 1) }, "OnAccent")
 
-	local mTgl = create("Frame", { Position = UDim2.fromOffset(0, 28), Size = UDim2.new(1, 0, 0, 22), BorderSizePixel = 0, Parent = mContent })
+	local mTgl = create("Frame", { Position = UDim2.fromOffset(0, 24), Size = UDim2.new(1, -6, 0, 18), BorderSizePixel = 0, Parent = mContent })
 	bind(mTgl, "BackgroundColor3", "Element")
-	corner(mTgl, 6)
-	textLabel(mTgl, { Text = "Toggle Option", TextSize = 11, TextXAlignment = Enum.TextXAlignment.Left, Position = UDim2.fromOffset(8, 0), Size = UDim2.new(1, -50, 1, 0) }, "Text")
-	local pill = create("Frame", { Size = UDim2.fromOffset(30, 14), Position = UDim2.new(1, -38, 0.5, -7), BackgroundColor3 = WHITE, BorderSizePixel = 0, Parent = mTgl })
-	corner(pill, 7)
-	bars[#bars + 1] = create("UIGradient", { Color = ColorSequence.new(Theme.Accent, Theme.Accent2), Parent = pill })
-	create("Frame", { Size = UDim2.fromOffset(10, 10), Position = UDim2.fromOffset(18, 2), BackgroundColor3 = WHITE, BorderSizePixel = 0, Parent = pill })
-	corner(pill:FindFirstChildWhichIsA("Frame"), 5)
-
-	local mSl = create("Frame", { Position = UDim2.fromOffset(0, 56), Size = UDim2.new(1, 0, 0, 22), BorderSizePixel = 0, Parent = mContent })
-	bind(mSl, "BackgroundColor3", "Element")
-	corner(mSl, 6)
-	local sBar = create("Frame", { Position = UDim2.new(0, 8, 0.5, -3), Size = UDim2.new(1, -16, 0, 6), BorderSizePixel = 0, Parent = mSl })
-	bind(sBar, "BackgroundColor3", "Stroke")
-	corner(sBar, 3)
-	local sFill = create("Frame", { Size = UDim2.new(0.6, 0, 1, 0), BackgroundColor3 = WHITE, BorderSizePixel = 0, Parent = sBar })
-	corner(sFill, 3)
-	bars[#bars + 1] = create("UIGradient", { Color = ColorSequence.new(Theme.Accent, Theme.Accent2), Parent = sFill })
-	local sKnob = create("Frame", { Size = UDim2.fromOffset(12, 12), Position = UDim2.new(0.6, -6, 0.5, -6), BackgroundColor3 = WHITE, BorderSizePixel = 0, Parent = sBar })
-	corner(sKnob, 6)
-	return f
+	corner(mTgl, 3)
+	textLabel(mTgl, { Text = "Toggle Option", Font = Enum.Font.GothamMedium, TextSize = 8, TextXAlignment = Enum.TextXAlignment.Left, Position = UDim2.fromOffset(4, 0), Size = UDim2.new(1, -4, 1, 0) }, "Text")
 end
 
-----------------------------------------------------------------
--- แกลเลอรีธีมสำเร็จรูป (+ ธีมของฉัน)
-----------------------------------------------------------------
 function TabMeta:AddThemeGallery()
-	local holder = create("Frame", { Size = UDim2.new(1, 0, 0, 100), BackgroundTransparency = 1, Parent = self.Page })
-	local grid = create("UIGridLayout", {
-		CellSize = UDim2.fromOffset(142, 78), CellPadding = UDim2.fromOffset(8, 8), SortOrder = Enum.SortOrder.LayoutOrder,
-		HorizontalAlignment = Enum.HorizontalAlignment.Center, Parent = holder,
-	})
+	local holder = create("Frame", { Size = UDim2.new(1, 0, 0, 100), BackgroundTransparency = 1, LayoutOrder = nextOrder(self), Parent = self.Page })
+	local grid = create("UIGridLayout", { CellSize = UDim2.fromOffset(142, 74), CellPadding = UDim2.fromOffset(8, 8), SortOrder = Enum.SortOrder.LayoutOrder, Parent = holder })
 	grid:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
 		holder.Size = UDim2.new(1, 0, 0, grid.AbsoluteContentSize.Y)
 	end)
 	local cards = {}
 	local obj = {}
-
 	function obj:Refresh()
 		for _, c in ipairs(cards) do
 			local sel = (c.name == Library.ThemeName)
@@ -17008,15 +17079,14 @@ function TabMeta:AddThemeGallery()
 			c.check.Visible = sel
 		end
 	end
-
 	local function addCard(p, order, custom)
 		local t = buildTheme(p.Main, p.Accent, p.Accent2)
 		local card = create("TextButton", { BackgroundColor3 = p.Main, BorderSizePixel = 0, Text = "", AutoButtonColor = false, LayoutOrder = order, ClipsDescendants = true, Parent = holder })
-		corner(card, 10)
+		corner(card, 8)
 		local stroke = create("UIStroke", { Thickness = 1.5, Color = t.Stroke, Parent = card })
 		local strip = create("Frame", { Size = UDim2.new(0, 40, 1, 0), BackgroundColor3 = t.Side, BorderSizePixel = 0, Parent = card })
 		for k = 0, 2 do
-			local r = create("Frame", { Position = UDim2.fromOffset(6, 10 + k * 14), Size = UDim2.fromOffset(28, 8), BackgroundColor3 = (k == 0) and p.Accent or t.Element, BorderSizePixel = 0, Parent = strip })
+			local r = create("Frame", { Position = UDim2.fromOffset(6, 10 + k * 14), Size = UDim2.fromOffset(28, 8), BackgroundColor3 = k == 0 and p.Accent or t.Element, BorderSizePixel = 0, Parent = strip })
 			corner(r, 3)
 		end
 		local top = create("Frame", { Position = UDim2.fromOffset(48, 10), Size = UDim2.new(1, -58, 0, 6), BackgroundColor3 = WHITE, BorderSizePixel = 0, Parent = card })
@@ -17026,18 +17096,17 @@ function TabMeta:AddThemeGallery()
 		corner(dot, 4)
 		local dot2 = create("Frame", { Position = UDim2.fromOffset(90, 24), Size = UDim2.fromOffset(12, 12), BackgroundColor3 = p.Accent2, BorderSizePixel = 0, Parent = card })
 		corner(dot2, 6)
-		local nm = p.Name
-		if custom then nm = "★ " .. p.Name end
-		create("TextLabel", { BackgroundTransparency = 1, Text = nm, FontFace = fnt(Enum.FontWeight.Bold), TextSize = 12, TextColor3 = t.Text, TextXAlignment = Enum.TextXAlignment.Left, TextTruncate = Enum.TextTruncate.AtEnd, Position = UDim2.fromOffset(48, 46), Size = UDim2.new(1, -54, 0, 20), Parent = card })
-		local check = create("TextLabel", { BackgroundTransparency = 1, Text = "✓", FontFace = fnt(Enum.FontWeight.Bold), TextSize = 16, TextColor3 = p.Accent, Position = UDim2.new(1, -24, 0, 2), Size = UDim2.fromOffset(20, 20), Visible = false, Parent = card })
+		local label = p.Name
+		if custom then label = "★ " .. p.Name end
+		create("TextLabel", { BackgroundTransparency = 1, Text = label, Font = Enum.Font.GothamBold, TextSize = 12, TextColor3 = t.Text, TextXAlignment = Enum.TextXAlignment.Left, TextTruncate = Enum.TextTruncate.AtEnd, Position = UDim2.fromOffset(48, 46), Size = UDim2.new(1, -54, 0, 18), Parent = card })
+		local check = create("TextLabel", { BackgroundTransparency = 1, Text = "✓", Font = Enum.Font.GothamBold, TextSize = 16, TextColor3 = p.Accent, Position = UDim2.new(1, -24, 0, 2), Size = UDim2.fromOffset(20, 20), Visible = false, Parent = card })
 		cards[#cards + 1] = { name = p.Name, stroke = stroke, check = check, idle = t.Stroke, frame = card }
 		card.MouseButton1Click:Connect(function()
 			Library.ThemeName = p.Name
-			setColors(p.Main, p.Accent, p.Accent2, false, "gallery")
+			setColors(p.Main, p.Accent, p.Accent2, false)
 			obj:Refresh()
 		end)
 	end
-
 	function obj:Rebuild()
 		for _, c in ipairs(cards) do c.frame:Destroy() end
 		table.clear(cards)
@@ -17052,7 +17121,6 @@ function TabMeta:AddThemeGallery()
 		end
 		obj:Refresh()
 	end
-
 	obj:Rebuild()
 	table.insert(themeListeners, function(source)
 		if source == "preset" then obj:Rebuild() else obj:Refresh() end
@@ -17060,206 +17128,397 @@ function TabMeta:AddThemeGallery()
 	return obj
 end
 
-
-----------------------------------------------------------------
--- ทำลาย UI ทั้งหมด
-----------------------------------------------------------------
-function Library:Destroy()
-	for _, c in ipairs(conns) do pcall(function() c:Disconnect() end) end
-	table.clear(conns)
-	table.clear(bindings)
-	table.clear(spinners)
-	table.clear(bars)
-	table.clear(themeListeners)
-	table.clear(rowFrames)
-	for _, sc in pairs(shortcuts) do
-		pcall(function()
-			if sc.Holder then sc.Holder:Destroy() end
-		end)
-	end
-	table.clear(shortcuts)
-	table.clear(shortcutOrder)
-	if shortcutGui then
-		pcall(function() shortcutGui:Destroy() end)
-		shortcutGui = nil
-	end
-	if windRef then
-		local w = windRef
-		windRef = nil
-		pcall(function() w:Destroy() end)
-	end
-	Library.Window = nil
-end
-
-----------------------------------------------------------------
--- สร้างหน้าต่าง
-----------------------------------------------------------------
-Library.RingEnabled = true
-
 function Library:CreateWindow(cfg)
 	cfg = cfg or {}
 	Library:Destroy()
-	if cfg.Title then Library.Title = cfg.Title end
-	if cfg.Author then Library.Author = cfg.Author end
-	if cfg.Icon then Library.Icon = cfg.Icon end
-	if cfg.ToggleKey then Library.ToggleKey = cfg.ToggleKey end
+	local parent = getGuiParent()
+	local old = parent:FindFirstChild(NAME)
+	if old then old:Destroy() end
 	if cfg.AutoLoad ~= false then Library:LoadConfig() end
 
-	syncWindTheme()
-	pcall(function() WindUI:AddTheme(windTheme) end)
-	pcall(function() WindUI:SetTheme(WIND_THEME) end)
-
+	local Window = { Tabs = {} }
 	local cam = workspace.CurrentCamera
 	local vp = cam and cam.ViewportSize or Vector2.new(1280, 720)
-	local W = math.min(cfg.Size and cfg.Size.X or 660, vp.X - 20)
-	local H = math.min(cfg.Size and cfg.Size.Y or 480, vp.Y - 20)
+	local W = math.min(cfg.Size and cfg.Size.X or 720, vp.X - 20)
+	local H = math.min(cfg.Size and cfg.Size.Y or 485, vp.Y - 20)
+	local sideW = W < 560 and 150 or 210
+	local HEAD_H = 60
+	local curW = W
+	Library._winW, Library._winH = W, H
 
-	local wind = WindUI:CreateWindow({
-		Title = Library.Title,
-		Author = Library.Author,
-		Icon = Library.Icon,
-		Folder = cfg.Folder or "RUOKHub",
-		Size = UDim2.fromOffset(W, H),
-		MinSize = Vector2.new(math.min(520, W), math.min(340, H)),
-		MaxSize = Vector2.new(920, 640),
-		Theme = WIND_THEME,
-		Transparent = Library.Transparency > 0,
-		Resizable = true,
-		ToggleKey = Library.ToggleKey,
-		SideBarWidth = (W < 560) and 160 or 200,
-		ScrollBarEnabled = true,
-		HideSearchBar = true,
-		Topbar = { Height = 52, ButtonsType = "Mac" },
-		User = { Enabled = true, Anonymous = false },
+	local gui = create("ScreenGui", { Name = NAME, ResetOnSpawn = false, ZIndexBehavior = Enum.ZIndexBehavior.Sibling, DisplayOrder = 999, Parent = parent })
+	Library.Gui, Library.Window = gui, Window
+	Window.Gui = gui
+
+	local main = create("Frame", {
+		Name = "Main", Size = UDim2.fromOffset(W, H), Position = UDim2.new(0.5, -W / 2, 0.5, -H / 2),
+		BorderSizePixel = 0, Active = true, ClipsDescendants = true, Parent = gui,
 	})
-	if not wind then
-		warn("[RUOK UI] สร้างหน้าต่าง Wind UI ไม่สำเร็จ (อาจมีหน้าต่างเก่าค้างอยู่)")
-		return nil
+	bind(main, "BackgroundColor3", "Main")
+	Window.Main = main
+	corner(main, 8)
+	local ring = create("UIStroke", { Thickness = 2.5, Color = WHITE, Parent = main })
+	spinners[#spinners + 1] = create("UIGradient", { Color = ringSequence(), Parent = ring })
+
+	local side = create("Frame", { Name = "Sidebar", Size = UDim2.new(0, sideW, 1, 0), BorderSizePixel = 0, Parent = main })
+	bind(side, "BackgroundColor3", "Side")
+	local sideLine = create("Frame", { Size = UDim2.new(0, 1, 1, 0), Position = UDim2.new(1, -1, 0, 0), BorderSizePixel = 0, Parent = side })
+	bind(sideLine, "BackgroundColor3", "Stroke")
+
+	-- โลโก้ภาพซ้ายบน (Sidebar)
+	local logoF = create("Frame", { Size = UDim2.new(1, 0, 0, 64), BackgroundTransparency = 1, Parent = side })
+	local logoImg = create("ImageLabel", {
+		Size = UDim2.new(0, 160, 0, 50),
+		Position = UDim2.new(0.5, 0, 0.5, 0),
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		BackgroundTransparency = 1,
+		ScaleType = Enum.ScaleType.Fit,
+		ResampleMode = Enum.ResamplerMode.Default,
+		Parent = logoF
+	})
+	
+	local DEFAULT_LOGO = "https://raw.githubusercontent.com/USBHub444/USBHub444/refs/heads/main/file_0000000072d08211b878eafb071d0b94.png"
+	local function setLogo(src)
+		Library.LogoUrl = src or ""
+		logoImg.Image = ""
+		if not src or src == "" then return end
+		if src:match("^rbxassetid://") or src:match("^rbxasset://") then
+			logoImg.Image = src
+			return
+		end
+		if src:match("^%d+$") then
+			logoImg.Image = "rbxassetid://" .. src
+			return
+		end
+		task.spawn(function()
+			pcall(function()
+				if writefile and getcustomasset then
+					local fn = "single_image_pure.png"
+					if src ~= DEFAULT_LOGO then
+						local clean = src:gsub("%W", "")
+						fn = "ruok_logo_" .. tostring(#src) .. "_" .. clean:sub(-16) .. ".png"
+					end
+					if not isfile(fn) then
+						local success, data = pcall(function() return game:HttpGet(src) end)
+						if success and data and #data > 0 then writefile(fn, data) end
+					end
+					if isfile(fn) then logoImg.Image = getcustomasset(fn) end
+				else
+					logoImg.Image = "rbxassetid://0"
+				end
+			end)
+		end)
 	end
-	windRef = wind
+	logoImg.Size = UDim2.new(0, Library.LogoWidth, 0, 50)
+	logoImg.Visible = Library.ShowLogo
+	Window.LogoImg = logoImg
+	Window.SetLogo = setLogo
+	setLogo(Library.LogoUrl)
 
-	local Window = { Tabs = {}, Wind = wind }
-	Library.Window = Window
-	local elemRadius = 14
-	pcall(function() elemRadius = math.clamp(wind.ElementConfig.UICorner, 8, 18) end)
+	local logoLine = create("Frame", { Size = UDim2.new(1, -24, 0, 2), Position = UDim2.fromOffset(12, 64), BorderSizePixel = 0, Parent = side })
+	bind(logoLine, "BackgroundColor3", "Stroke")
 
-	-- ขอบเรืองแสงหมุน (สไตล์เดิมของคุณ)
-	local ringF = create("Frame", { Name = "RUOKRing", Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1, ZIndex = 200, Active = false, Visible = Library.RingEnabled, Parent = wind.UIElements.Main })
-	create("UICorner", { CornerRadius = UDim.new(0, wind.UICorner or 16), Parent = ringF })
-	local ringStroke = create("UIStroke", { Thickness = 2.5, Color = WHITE, ApplyStrokeMode = Enum.ApplyStrokeMode.Border, Parent = ringF })
-	spinners[#spinners + 1] = create("UIGradient", { Color = ringSequence(), Parent = ringStroke })
-	Window.Ring = ringF
+	local tabList = create("ScrollingFrame", {
+		Position = UDim2.fromOffset(0, 70), Size = UDim2.new(1, 0, 1, -136), BackgroundTransparency = 1, BorderSizePixel = 0,
+		ScrollBarThickness = 3, CanvasSize = UDim2.new(), AutomaticCanvasSize = Enum.AutomaticSize.Y, Parent = side,
+	})
+	bind(tabList, "ScrollBarImageColor3", "Accent")
+	create("UIListLayout", { Padding = UDim.new(0, 6), SortOrder = Enum.SortOrder.LayoutOrder, Parent = tabList })
+	create("UIPadding", { PaddingTop = UDim.new(0, 4), PaddingLeft = UDim.new(0, 10), PaddingRight = UDim.new(0, 10), Parent = tabList })
 
-	pcall(function() wind:SetUIScale(Library.UIScale) end)
-	if Library.Transparency > 0 then
-		pcall(function() wind:SetBackgroundTransparency(Library.Transparency) end)
+	local pf = create("Frame", { Size = UDim2.new(1, -16, 0, 52), Position = UDim2.new(0, 8, 1, -60), BorderSizePixel = 0, Parent = side })
+	bind(pf, "BackgroundColor3", "Element")
+	corner(pf, 6)
+	local pfs = create("UIStroke", { Thickness = 1.5, Color = WHITE, Parent = pf })
+	spinners[#spinners + 1] = create("UIGradient", { Color = ringSequence(), Parent = pfs })
+	
+	local avatar = create("ImageLabel", { Size = UDim2.fromOffset(36, 36), Position = UDim2.new(0, 8, 0.5, -18), BackgroundTransparency = 1, Parent = pf })
+	corner(avatar, 18)
+	task.spawn(function()
+		local ok, img = pcall(function()
+			return Players:GetUserThumbnailAsync(LocalPlayer.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size100x100)
+		end)
+		if ok and avatar.Parent then avatar.Image = img end
+	end)
+	textLabel(pf, { Text = LocalPlayer.DisplayName, Font = Enum.Font.GothamBold, TextSize = 13, TextXAlignment = Enum.TextXAlignment.Left, TextTruncate = Enum.TextTruncate.AtEnd, Position = UDim2.fromOffset(52, 8), Size = UDim2.new(1, -58, 0, 18) }, "Text")
+	textLabel(pf, { Text = "@" .. LocalPlayer.Name, Font = Enum.Font.Gotham, TextSize = 11, TextXAlignment = Enum.TextXAlignment.Left, TextTruncate = Enum.TextTruncate.AtEnd, Position = UDim2.fromOffset(52, 28), Size = UDim2.new(1, -58, 0, 14) }, "Sub")
+
+	-- Header ฝั่งขวา: ชื่อ ! Clown ขนาด 24 (เปลี่ยนสีตาม Accent ธีม) + r3z by uou ขนาด 14 (สีเทาคงที่) + เส้นคั่นสีเทายาวเกือบถึงขอบ
+	local header = create("Frame", { Position = UDim2.fromOffset(sideW, 0), Size = UDim2.new(1, -sideW, 0, HEAD_H), BackgroundTransparency = 1, Parent = main })
+	
+	-- ชื่อสคริปต์หลัก ! Clown (ขนาด 24 สีเปลี่ยนตาม Accent ธีม)
+	local headTitle = create("TextLabel", {
+		BackgroundTransparency = 1,
+		Position = UDim2.fromOffset(16, 6),
+		Size = UDim2.new(1, -100, 0, 26),
+		Font = Enum.Font.GothamBold,
+		TextSize = Library.TitleSize,
+		Text = Library.Title,
+		TextXAlignment = Enum.TextXAlignment.Left,
+		Parent = header
+	})
+	bind(headTitle, "TextColor3", "Accent")
+
+	-- ข้อความใต้ชื่อ r3z by uou (ขนาด 14 สีเทา Sub คงที่ ไม่เปลี่ยนตามธีม)
+	local headSub = create("TextLabel", {
+		BackgroundTransparency = 1,
+		Position = UDim2.fromOffset(16, 32),
+		Size = UDim2.new(1, -100, 0, 18),
+		Font = Enum.Font.Gotham,
+		TextSize = Library.SubSize,
+		Text = Library.Sub,
+		TextXAlignment = Enum.TextXAlignment.Left,
+		Parent = header
+	})
+	bind(headSub, "TextColor3", "Sub")
+	Window.HeadTitle, Window.HeadSub = headTitle, headSub
+
+	-- เส้นคั่นสีเทายาวใต้ข้อความ (เว้นระยะไม่ชนขอบ)
+	local subLine = create("Frame", {
+		Position = UDim2.new(0, 16, 1, -2),
+		Size = UDim2.new(1, -32, 0, 1),
+		BorderSizePixel = 0,
+		Parent = header
+	})
+	bind(subLine, "BackgroundColor3", "Stroke")
+
+	makeDraggable(header, main)
+	makeDraggable(logoF, main)
+
+	-- [เพิ่ม] ปุ่มควบคุมหน้าต่างหลายสไตล์ (เลือกได้ที่ Settings)  หน้าที่เหมือนเดิม: ปิด / ย่อ / ขยาย
+	local minimized = false
+	local wide = false
+	local function doClose()
+		tween(main, { BackgroundTransparency = 1 }, 0.2)
+		task.wait(0.2)
+		Library:Destroy()
 	end
-	refreshOpenButton(true)
-	pcall(function()
-		wind:OnDestroy(function()
-			if windRef == wind then
-				windRef = nil
-				Library:Destroy()
+	local function doMin()
+		minimized = not minimized
+		tween(main, { Size = UDim2.fromOffset(curW, minimized and HEAD_H or H) }, 0.25)
+	end
+	local function doMax()
+		wide = not wide
+		curW = math.min(W + (wide and 120 or 0), vp.X - 20)
+		tween(main, { Size = UDim2.fromOffset(curW, minimized and HEAD_H or H) }, 0.3)
+	end
+	local roleAction = { close = doClose, min = doMin, max = doMax }
+	local roleIcon = { close = "x", min = "minus", max = "square" }
+	local roleGlyph = { close = "✕", min = "–", max = "□" }
+
+	local ctrl = create("Frame", { Name = "Controls", Size = UDim2.fromOffset(150, 46), AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -12, 0, HEAD_H / 2), BackgroundTransparency = 1, Parent = header })
+	local function buildControls()
+		for _, c in ipairs(ctrl:GetChildren()) do c:Destroy() end
+		local st = Library.ControlStyles[Library.ControlStyle] or Library.ControlStyles["Mac Glossy"]
+		local n = #st.Order
+		local pad, size, gap = st.Pad, st.Size, st.Gap
+		local totalW = n * size + (n - 1) * gap + pad * 2
+		local totalH = size + pad * 2
+		local pill = create("Frame", { Size = UDim2.fromOffset(totalW, totalH), AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, 0, 0.5, 0), BackgroundColor3 = st.Bg, BackgroundTransparency = st.BgT, BorderSizePixel = 0, ClipsDescendants = true, Parent = ctrl })
+		corner(pill, math.floor(totalH / 2))
+		local ps = create("UIStroke", { Thickness = 1.8, Transparency = 0.15, Parent = pill })
+		bind(ps, "Color", "Accent")
+		for i, role in ipairs(st.Order) do
+			local x = pad + (i - 1) * (size + gap)
+			local color = st.Colors[role]
+			local btn = create("TextButton", { Size = UDim2.fromOffset(size, size), Position = UDim2.fromOffset(x, pad), BorderSizePixel = 0, Text = "", AutoButtonColor = false, Parent = pill })
+			if color then
+				btn.BackgroundColor3 = color
+			else
+				btn.BackgroundTransparency = 1
+			end
+			if st.Shape == "circle" then
+				corner(btn, math.floor(size / 2))
+			elseif st.Shape == "square" then
+				corner(btn, 8)
+			end
+			if st.Ring then
+				create("UIStroke", { Thickness = 2, Color = st.RingColor, Parent = btn })
+			elseif st.Shape ~= "flat" then
+				create("UIStroke", { Thickness = 1.2, Color = BLACK, Transparency = 0.7, Parent = btn })
+			end
+			if st.Gloss then
+				create("UIGradient", { Rotation = 90, Color = ColorSequence.new(WHITE, Color3.fromRGB(190, 190, 190)), Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0), NumberSequenceKeypoint.new(1, 0.15) }), Parent = btn })
+			end
+			if st.Icons then
+				local isz = math.floor(size * 0.52)
+				local img, ok = iconLabel(btn, roleIcon[role], isz, nil, { ImageColor3 = st.IconColor, Position = UDim2.new(0.5, -isz / 2, 0.5, -isz / 2) })
+				if not ok then
+					img:Destroy()
+					create("TextLabel", { BackgroundTransparency = 1, Text = roleGlyph[role], Font = Enum.Font.GothamBold, TextSize = math.floor(size * 0.55), TextColor3 = st.IconColor, Size = UDim2.fromScale(1, 1), Parent = btn })
+				end
+			end
+			if st.Dividers and i > 1 then
+				create("Frame", { Size = UDim2.new(0, 1, 0.55, 0), Position = UDim2.new(0, x - 1, 0.225, 0), BackgroundColor3 = WHITE, BackgroundTransparency = 0.7, BorderSizePixel = 0, Parent = pill })
+			end
+			local sc = create("UIScale", { Parent = btn })
+			btn.MouseEnter:Connect(function() tween(sc, { Scale = 1.12 }, 0.12) end)
+			btn.MouseLeave:Connect(function() tween(sc, { Scale = 1 }, 0.12) end)
+			btn.MouseButton1Click:Connect(function() roleAction[role]() end)
+		end
+	end
+	buildControls()
+	Window.RebuildControls = buildControls
+
+	local pages = create("Frame", { Position = UDim2.fromOffset(sideW, HEAD_H), Size = UDim2.new(1, -sideW, 1, -HEAD_H), BackgroundTransparency = 1, ClipsDescendants = true, Parent = main })
+
+	local nh = create("Frame", { AnchorPoint = Vector2.new(1, 1), Position = UDim2.new(1, -16, 1, -16), Size = UDim2.new(0, 270, 1, -32), BackgroundTransparency = 1, Parent = gui })
+	create("UIListLayout", { Padding = UDim.new(0, 8), SortOrder = Enum.SortOrder.LayoutOrder, VerticalAlignment = Enum.VerticalAlignment.Bottom, Parent = nh })
+	Library.NotifyHolder = nh
+
+	local tabSound
+	if cfg.TabSound then tabSound = create("Sound", { SoundId = cfg.TabSound, Volume = 1, Parent = gui }) end
+
+	-- [เพิ่ม] ปุ่มเปิด/ปิด UI ลอยสไตล์ใหม่ (Orb / Pill / Keycap) ลากย้ายได้
+	local fbObj = nil
+	local function buildOpenButton()
+		if fbObj then
+			pcall(function() fbObj:Destroy() end)
+			fbObj = nil
+		end
+		local show = Library.ShowOpenButton
+		if show == nil then
+			if cfg.ToggleButton ~= nil then show = cfg.ToggleButton else show = UIS.TouchEnabled end
+		end
+		if not show then return end
+		local style = Library.OpenButtonStyle
+		local pos = Library.OpenButtonPos or UDim2.new(0, 14, 0.5, -28)
+		local handle, target
+		if style == "Keycap" then
+			local card = newCard(gui, { Icon = "menu", Title = "เปิด UI", Sub = Library.Title })
+			if UIS.KeyboardEnabled then
+				card.KeyText.Text = keyLabel(Library.ToggleKey)
+				card.KeyIcon.Visible = false
+			end
+			card.Body.BackgroundTransparency = 0.1
+			card.Holder.Position = pos
+			card.Scale.Scale = Library.OpenButtonScale
+			handle, target, fbObj = card.Body, card.Holder, card.Holder
+		elseif style == "Pill" then
+			local b = create("TextButton", { Size = UDim2.fromOffset(150, 46), Position = pos, BackgroundColor3 = WHITE, BorderSizePixel = 0, Text = "", AutoButtonColor = false, Parent = gui })
+			corner(b, 23)
+			bars[#bars + 1] = create("UIGradient", { Color = ColorSequence.new(Theme.Accent, Theme.Accent2), Parent = b })
+			local ps = create("UIStroke", { Thickness = 2.5, Color = WHITE, Parent = b })
+			spinners[#spinners + 1] = create("UIGradient", { Color = ringSequence(), Parent = ps })
+			iconLabel(b, "menu", 22, nil, { ImageColor3 = WHITE, Position = UDim2.new(0, 14, 0.5, -11) })
+			local t = create("TextLabel", { BackgroundTransparency = 1, Text = Library.Title, Font = Enum.Font.GothamBold, TextSize = 15, TextColor3 = WHITE, TextTruncate = Enum.TextTruncate.AtEnd, TextXAlignment = Enum.TextXAlignment.Left, Position = UDim2.fromOffset(44, 0), Size = UDim2.new(1, -54, 1, 0), Parent = b })
+			t.TextStrokeTransparency = 0.7
+			create("UIScale", { Scale = Library.OpenButtonScale, Parent = b })
+			handle, target, fbObj = b, b, b
+		else
+			local b = create("TextButton", { Size = UDim2.fromOffset(58, 58), Position = pos, BorderSizePixel = 0, Text = "", AutoButtonColor = false, Parent = gui })
+			bind(b, "BackgroundColor3", "Side")
+			corner(b, 29)
+			local rs = create("UIStroke", { Thickness = 3.5, Color = WHITE, Parent = b })
+			spinners[#spinners + 1] = create("UIGradient", { Color = ringSequence(), Parent = rs })
+			local core = create("Frame", { Size = UDim2.fromOffset(40, 40), Position = UDim2.new(0.5, -20, 0.5, -20), BackgroundColor3 = WHITE, BorderSizePixel = 0, Parent = b })
+			corner(core, 20)
+			bars[#bars + 1] = create("UIGradient", { Rotation = 90, Color = ColorSequence.new(Theme.Accent, Theme.Accent2), Parent = core })
+			local img, ok = iconLabel(core, "power", 22, nil, { ImageColor3 = WHITE, Position = UDim2.new(0.5, -11, 0.5, -11) })
+			if not ok then
+				img:Destroy()
+				create("TextLabel", { BackgroundTransparency = 1, Text = "☰", Font = Enum.Font.GothamBold, TextSize = 20, TextColor3 = WHITE, Size = UDim2.fromScale(1, 1), Parent = core })
+			end
+			create("UIScale", { Scale = Library.OpenButtonScale, Parent = b })
+			handle, target, fbObj = b, b, b
+		end
+		local st = makeDraggable(handle, target)
+		handle.MouseButton1Click:Connect(function()
+			if not st.moved then
+				main.Visible = not main.Visible
+				if Library._syncWindPos then Library._syncWindPos() end
 			end
 		end)
-	end)
+		track(target:GetPropertyChangedSignal("Position"):Connect(function() Library.OpenButtonPos = target.Position end))
+	end
+	buildOpenButton()
+	Window.RebuildOpenButton = buildOpenButton
 
-	-- วนอัปเดตขอบหมุน + สีรุ้ง
-	local acc = 0
+	startShortcutInput()
+	if Library._syncWindPos then
+		track(main:GetPropertyChangedSignal("Position"):Connect(Library._syncWindPos))
+	end
+
+	track(UIS.InputBegan:Connect(function(input, gp)
+		if not gp and input.KeyCode == Library.ToggleKey then main.Visible = not main.Visible end
+	end))
+
 	track(RunService.Heartbeat:Connect(function(dt)
-		if Library.SpinEnabled and Library.RingEnabled then
-			for _, g in ipairs(spinners) do
-				if g.Parent then g.Rotation = (g.Rotation + dt * Library.SpinSpeed) % 360 end
-			end
+		if Library.SpinEnabled then
+			for _, g in ipairs(spinners) do g.Rotation = (g.Rotation + dt * Library.SpinSpeed) % 360 end
 		end
 		if Library.Rainbow then
-			acc = acc + dt
-			if acc >= 0.06 then
-				acc = 0
-				local hue = (os.clock() * 0.08) % 1
-				setAccent(Color3.fromHSV(hue, 0.75, 1), Color3.fromHSV((hue + 0.15) % 1, 0.75, 1), true)
-			end
+			local hue = (os.clock() * 0.08) % 1
+			setAccent(Color3.fromHSV(hue, 0.75, 1), Color3.fromHSV((hue + 0.15) % 1, 0.75, 1))
 		end
 	end))
 
-	startShortcutInput()
-
-	------------------------------------------------------------
-	-- เมธอดของหน้าต่าง
-	------------------------------------------------------------
 	function Window:SetTransparency(x)
 		Library.Transparency = x
-		pcall(function() wind:SetBackgroundTransparency(x) end)
-		for i = #rowFrames, 1, -1 do
-			local r = rowFrames[i]
-			if r.Parent then r.BackgroundTransparency = x else table.remove(rowFrames, i) end
-		end
-		pushTheme(false)
+		main.BackgroundTransparency = x
+		side.BackgroundTransparency = x
 	end
-
-	function Window:SetUIScale(x)
-		Library.UIScale = x
-		pcall(function() wind:SetUIScale(x) end)
-	end
-
-	function Window:SetTitle(t)
-		Library.Title = t
-		pcall(function() wind:SetTitle(t) end)
-		refreshOpenButton(true)
-	end
-
-	function Window:SetAuthor(t)
-		Library.Author = t
-		pcall(function() wind:SetAuthor(t) end)
-	end
-
-	function Window:SetIcon(icon)
-		Library.Icon = icon
-		pcall(function()
-			local left = wind.UIElements.Main.Main.Topbar.Left
-			local holder
-			for _, c in ipairs(left:GetChildren()) do
-				if c:IsA("Frame") and c:FindFirstChildWhichIsA("ImageLabel", true) then
-					holder = c
-					break
-				end
-			end
-			if not holder then
-				holder = create("Frame", { Name = "RUOKIcon", Size = UDim2.fromOffset(22, 22), BackgroundTransparency = 1, LayoutOrder = -1, Parent = left })
-			end
-			for _, c in ipairs(holder:GetChildren()) do c:Destroy() end
-			local img = Creator.Image(icon, Library.Title, wind.IconRadius or 0, wind.Folder, "Window", true, wind.IconThemed, "WindowTopbarIcon")
-			img.Parent = holder
-			img.Size = UDim2.fromOffset(wind.IconSize or 22, wind.IconSize or 22)
-			img.Position = UDim2.fromScale(0.5, 0.5)
-			img.AnchorPoint = Vector2.new(0.5, 0.5)
-		end)
-		refreshOpenButton(true)
-	end
-
-	function Window:SetToggleKey(k)
-		Library.ToggleKey = k
-		pcall(function() wind:SetToggleKey(k) end)
-	end
-
-	function Window:Toggle() pcall(function() wind:Toggle() end) end
+	function Window:Toggle() main.Visible = not main.Visible end
 	function Window:Destroy() Library:Destroy() end
+
+	local function selectTab(t)
+		for _, x in ipairs(Window.Tabs) do
+			local on = (x == t)
+			x.Page.Visible = on
+			x.Indicator.Visible = on
+			if on then
+				x.Button.BackgroundTransparency = 0
+				x.Stroke.Transparency = 0
+			else
+				x.Button.BackgroundTransparency = 0.6
+				x.Stroke.Transparency = 1
+			end
+		end
+		if tabSound then pcall(function() tabSound:Play() end) end
+	end
 
 	function Window:AddTab(info)
 		info = info or {}
-		local wt = wind:Tab({ Title = info.Name or "Tab", Desc = info.Sub, Icon = info.Icon })
-		local tab = setmetatable({ Wind = wt, Name = info.Name or "Tab", Sub = info.Sub, Radius = elemRadius }, TabMeta)
-		tab.Page = wt.UIElements.ContainerFrame
-		Window.Tabs[#Window.Tabs + 1] = tab
-		return tab
+		local Tab = setmetatable({ _order = 0, Name = info.Name or "Tab", Sub = info.Sub }, TabMeta)
+		local idx = #Window.Tabs + 1
+
+		local btn = create("TextButton", { Size = UDim2.new(1, 0, 0, 42), BorderSizePixel = 0, Text = "", AutoButtonColor = false, BackgroundTransparency = 0.6, LayoutOrder = idx, ClipsDescendants = true, Parent = tabList })
+		bind(btn, "BackgroundColor3", "Element")
+		corner(btn, 6)
+		
+		local btnStroke = create("UIStroke", { Thickness = 1.8, Transparency = 1, Parent = btn })
+		bind(btnStroke, "Color", "Accent")
+		Tab.Stroke = btnStroke
+
+		local ind = create("Frame", { Size = UDim2.new(0, 3, 0, 22), Position = UDim2.new(0, 0, 0.5, -11), BorderSizePixel = 0, Visible = false, Parent = btn })
+		bind(ind, "BackgroundColor3", "Accent")
+		corner(ind, 2)
+		local tx = 12
+		if info.Icon then
+			create("ImageLabel", { Size = UDim2.fromOffset(24, 24), Position = UDim2.new(0, 10, 0.5, -12), BackgroundTransparency = 1, Image = info.Icon, Parent = btn })
+			tx = 42
+		end
+		textLabel(btn, { Text = Tab.Name, Font = Enum.Font.GothamBold, TextSize = 14, TextXAlignment = Enum.TextXAlignment.Left, Position = UDim2.fromOffset(tx, 4), Size = UDim2.new(1, -(tx + 6), 0, 18) }, "Text")
+		textLabel(btn, { Text = info.Sub or "", Font = Enum.Font.Gotham, TextSize = 11, TextXAlignment = Enum.TextXAlignment.Left, Position = UDim2.fromOffset(tx, 22), Size = UDim2.new(1, -(tx + 6), 0, 14) }, "Sub")
+
+		local page = create("ScrollingFrame", {
+			Name = Tab.Name, Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1, BorderSizePixel = 0, ScrollBarThickness = 3,
+			CanvasSize = UDim2.new(), AutomaticCanvasSize = Enum.AutomaticSize.Y, Visible = false, Parent = pages,
+		})
+		bind(page, "ScrollBarImageColor3", "Accent")
+		create("UIListLayout", { Padding = UDim.new(0, 8), SortOrder = Enum.SortOrder.LayoutOrder, Parent = page })
+		create("UIPadding", { PaddingTop = UDim.new(0, 12), PaddingBottom = UDim.new(0, 12), PaddingLeft = UDim.new(0, 14), PaddingRight = UDim.new(0, 14), Parent = page })
+
+		Tab.Button, Tab.Page, Tab.Indicator = btn, page, ind
+		Window.Tabs[idx] = Tab
+		btn.MouseButton1Click:Connect(function() selectTab(Tab) end)
+		if idx == 1 then selectTab(Tab) end
+		return Tab
 	end
 
-	------------------------------------------------------------
-	-- หมวดหมู่ตั้งค่า (ปรับแต่ง UI ทั้งหมด)
-	------------------------------------------------------------
 	function Window:AddSettingsTab(info)
 		info = info or {}
-		local tab = Window:AddTab({ Name = info.Name or "Settings", Sub = info.Sub or "ปรับแต่ง UI", Icon = info.Icon or "lucide:settings" })
+		local tab = Window:AddTab({ Name = info.Name or "Settings", Sub = info.Sub or "ปรับแต่ง UI", Icon = info.Icon })
 
 		tab:AddSection("ตัวอย่างสด")
 		tab:AddPreview()
@@ -17276,16 +17535,12 @@ function Library:CreateWindow(cfg)
 		end })
 		accPick = tab:AddColorPicker({ Name = "สีหลัก", Default = Theme.Accent, Callback = function(c)
 			Library.ThemeName = "Custom"
-			setAccent(c, Theme.Accent2, true)
-			fireListeners("picker")
-			refreshOpenButton()
+			setAccent(c, Theme.Accent2)
 			gallery:Refresh()
 		end })
 		acc2Pick = tab:AddColorPicker({ Name = "สีรอง", Default = Theme.Accent2, Callback = function(c)
 			Library.ThemeName = "Custom"
-			setAccent(Theme.Accent, c, true)
-			fireListeners("picker")
-			refreshOpenButton()
+			setAccent(Theme.Accent, c)
 			gallery:Refresh()
 		end })
 		table.insert(themeListeners, function(source)
@@ -17298,41 +17553,52 @@ function Library:CreateWindow(cfg)
 
 		tab:AddSection("ธีมของฉัน")
 		local myName = "ธีมของฉัน"
-		tab:AddTextbox({ Name = "ชื่อธีม", Placeholder = "ตั้งชื่อธีม", Default = myName, Callback = function(t)
+		tab:AddTextbox({ Name = "ชื่อธีม", Default = myName, Placeholder = "ตั้งชื่อธีม", Callback = function(t)
 			if t and t ~= "" then myName = t end
 		end })
-		tab:AddButton({ Name = "บันทึกสีปัจจุบันเป็นธีมของฉัน", Desc = "เพิ่มการ์ดธีมใหม่ในแกลเลอรี (กดบันทึกการตั้งค่าเพื่อเก็บถาวร)", Icon = "lucide:bookmark-plus", Callback = function()
+		tab:AddButton({ Name = "บันทึกสีปัจจุบันเป็นธีมของฉัน", Callback = function()
 			Library:AddPreset({ Name = myName, Main = Theme.Main, Accent = Theme.Accent, Accent2 = Theme.Accent2 })
 			Library.ThemeName = myName
 			gallery:Refresh()
-			Library:Notify({ Title = "บันทึกธีมแล้ว", Text = "เพิ่มธีม \"" .. myName .. "\" ในแกลเลอรี", Duration = 3 })
+			Library:Notify({ Title = "บันทึกธีมแล้ว", Text = "เพิ่มธีม \"" .. myName .. "\" ในแกลเลอรี (กดบันทึกการตั้งค่าเพื่อเก็บถาวร)" })
 		end })
 
 		tab:AddSection("ปรับแต่ง UI ทั่วไป")
-		tab:AddSlider({ Name = "ขนาด UI", Min = 60, Max = 130, Default = math.floor(Library.UIScale * 100 + 0.5), Increment = 5, Suffix = "%", Callback = function(v)
-			Window:SetUIScale(v / 100)
+		tab:AddSlider({ Name = "ปรับขนาดตัวอักษร", Min = -3, Max = 5, Default = 0, Suffix = "px", Callback = function(v)
+			updateFontSize(v)
 		end })
-		tab:AddSlider({ Name = "ความโปร่งใสหน้าต่าง", Min = 0, Max = 60, Default = math.floor(Library.Transparency * 100 + 0.5), Increment = 5, Suffix = "%", Callback = function(v)
+		tab:AddSlider({ Name = "ความโปร่งใสหน้าต่าง", Min = 0, Max = 60, Default = math.floor(Library.Transparency * 100), Suffix = "%", Callback = function(v)
 			Window:SetTransparency(v / 100)
 		end })
-		tab:AddToggle({ Name = "ขอบเรืองแสง", Default = Library.RingEnabled, Callback = function(v)
-			Library.RingEnabled = v
-			ringF.Visible = v
-		end })
-		tab:AddToggle({ Name = "ขอบหมุน", Default = Library.SpinEnabled, Callback = function(v) Library.SpinEnabled = v end })
+		tab:AddToggle({ Name = "ขอบเรืองแสงหมุน", Default = Library.SpinEnabled, Callback = function(v) Library.SpinEnabled = v end })
 		tab:AddSlider({ Name = "ความเร็วขอบหมุน", Min = 10, Max = 300, Default = Library.SpinSpeed, Increment = 5, Callback = function(v) Library.SpinSpeed = v end })
 		tab:AddToggle({ Name = "สีรุ้ง", Default = Library.Rainbow, Callback = function(v)
 			Library.Rainbow = v
 			if not v then
 				Library.ThemeName = "Custom"
-				fireListeners("rainbow")
 				gallery:Refresh()
 			end
 		end })
-		tab:AddKeybind({ Name = "ปุ่มเปิดปิด UI", Default = Library.ToggleKey, Changed = function(k) Window:SetToggleKey(k) end })
-		tab:AddToggle({ Name = "แสดงปุ่มเปิด UI", Desc = "ปุ่มลอยสำหรับเปิดหน้าต่าง (มือถือ/คอม)", Default = Library.ShowOpenButton, Callback = function(v)
+		tab:AddKeybind({ Name = "ปุ่มเปิดปิด UI", Default = Library.ToggleKey, Changed = function(k) Library.ToggleKey = k end })
+
+		tab:AddSection("ปุ่มควบคุมหน้าต่าง")
+		tab:AddDropdown({ Name = "สไตล์ปุ่ม ปิด / ย่อ / ขยาย", Options = Library.ControlStyleNames, Default = Library.ControlStyle, Callback = function(v)
+			Library.ControlStyle = v
+			Window.RebuildControls()
+		end })
+
+		tab:AddSection("ปุ่มเปิด UI")
+		tab:AddToggle({ Name = "แสดงปุ่มเปิด UI", Desc = "ปุ่มลอยลากย้ายได้ (มือถือเปิดอยู่แล้วโดยปริยาย)", Default = (Library.ShowOpenButton == true) or (Library.ShowOpenButton == nil and UIS.TouchEnabled), Callback = function(v)
 			Library.ShowOpenButton = v
-			refreshOpenButton(true)
+			Window.RebuildOpenButton()
+		end })
+		tab:AddDropdown({ Name = "สไตล์ปุ่มเปิด UI", Options = { "Orb", "Pill", "Keycap" }, Default = Library.OpenButtonStyle, Callback = function(v)
+			Library.OpenButtonStyle = v
+			Window.RebuildOpenButton()
+		end })
+		tab:AddSlider({ Name = "ขนาดปุ่มเปิด UI", Min = 60, Max = 160, Default = math.floor(Library.OpenButtonScale * 100 + 0.5), Increment = 5, Suffix = "%", Callback = function(v)
+			Library.OpenButtonScale = v / 100
+			Window.RebuildOpenButton()
 		end })
 
 		tab:AddSection("ปุ่มลัด")
@@ -17358,49 +17624,66 @@ function Library:CreateWindow(cfg)
 			Library.ShortcutLocked = v
 			Library:RefreshShortcuts()
 		end })
-		tab:AddButton({ Name = "รีเซ็ตตำแหน่งปุ่มลัด", Icon = "lucide:rotate-ccw", Callback = function() Library:ResetShortcutPositions() end })
+		tab:AddButton({ Name = "รีเซ็ตตำแหน่งปุ่มลัด", Callback = function() Library:ResetShortcutPositions() end })
 
-		tab:AddSection("ซ้ายบน (ชื่อ / ข้อความ / ไอคอน)")
-		tab:AddTextbox({ Name = "ชื่อสคริปต์", Desc = "ข้อความใหญ่มุมซ้ายบน", Default = Library.Title, Callback = function(t)
-			if t and t ~= "" then Window:SetTitle(t) end
+		tab:AddSection("ซ้ายบน (ชื่อ / ข้อความ / โลโก้)")
+		tab:AddTextbox({ Name = "ชื่อสคริปต์", Default = Library.Title, Callback = function(t)
+			if t and t ~= "" then
+				Library.Title = t
+				Window.HeadTitle.Text = t
+				if Window.RebuildOpenButton and Library.OpenButtonStyle ~= "Orb" then Window.RebuildOpenButton() end
+			end
 		end })
-		tab:AddTextbox({ Name = "ข้อความรอง", Desc = "ข้อความเล็กด้านข้างชื่อ", Default = Library.Author, Callback = function(t)
-			Window:SetAuthor(t or "")
+		tab:AddTextbox({ Name = "ข้อความรอง", Default = Library.Sub, Callback = function(t)
+			Library.Sub = t or ""
+			Window.HeadSub.Text = Library.Sub
 		end })
-		tab:AddTextbox({ Name = "ไอคอน", Desc = "เช่น lucide:star หรือ rbxassetid://123456", Default = Library.Icon, Callback = function(t)
-			if t and t ~= "" then Window:SetIcon(t) end
+		tab:AddSlider({ Name = "ขนาดชื่อสคริปต์", Min = 14, Max = 36, Default = Library.TitleSize, Suffix = "px", Callback = function(v)
+			Library.TitleSize = v
+			Window.HeadTitle.TextSize = v
+		end })
+		tab:AddSlider({ Name = "ขนาดข้อความรอง", Min = 9, Max = 22, Default = Library.SubSize, Suffix = "px", Callback = function(v)
+			Library.SubSize = v
+			Window.HeadSub.TextSize = v
+		end })
+		tab:AddToggle({ Name = "แสดงโลโก้ซ้ายบน", Default = Library.ShowLogo, Callback = function(v)
+			Library.ShowLogo = v
+			Window.LogoImg.Visible = v
+		end })
+		tab:AddTextbox({ Name = "โลโก้ (ลิงก์รูป / rbxassetid)", Default = Library.LogoUrl, Placeholder = "https://... หรือ 123456", Callback = function(t)
+			Window.SetLogo(t or "")
+		end })
+		tab:AddSlider({ Name = "ความกว้างโลโก้", Min = 80, Max = 190, Default = Library.LogoWidth, Increment = 5, Suffix = "px", Callback = function(v)
+			Library.LogoWidth = v
+			Window.LogoImg.Size = UDim2.new(0, v, 0, 50)
 		end })
 
 		tab:AddSection("การตั้งค่า")
-		tab:AddButton({ Name = "บันทึกการตั้งค่า", Desc = "ธีม สี ปุ่มลัด ตำแหน่ง ชื่อซ้ายบน", Icon = "lucide:save", Callback = function()
-			local ok = Library:SaveConfig()
-			if ok then
-				Library:Notify({ Title = "บันทึกแล้ว", Text = "บันทึกการตั้งค่าเรียบร้อย", Duration = 3 })
+		tab:AddButton({ Name = "บันทึกการตั้งค่าทั้งหมด", Callback = function()
+			if Library:SaveConfig() then
+				Library:Notify({ Title = "บันทึกแล้ว", Text = "บันทึกธีม ปุ่มลัด และการตั้งค่าซ้ายบนเรียบร้อย" })
 			else
-				Library:Notify({ Title = "บันทึกไม่ได้", Text = "executor นี้ไม่รองรับ writefile", Duration = 4 })
+				Library:Notify({ Title = "บันทึกไม่ได้", Text = "executor นี้ไม่รองรับ writefile" })
 			end
 		end })
-		tab:AddButton({ Name = "รีเซ็ตเป็นค่าเริ่มต้น", Icon = "lucide:eraser", Callback = function()
+		tab:AddButton({ Name = "รีเซ็ตเป็นค่าเริ่มต้น", Callback = function()
 			Library.Rainbow = false
 			Library:SetTheme("Sky Milk")
 			Window:SetTransparency(0)
-			Window:SetUIScale(1)
-			Library.ShortcutScale = 1
-			Library.ShortcutTransparency = 0.15
+			Library.ShortcutScale, Library.ShortcutTransparency = 1, 0.15
 			Library:ResetShortcutPositions()
-			Library:Notify({ Title = "รีเซ็ตแล้ว", Text = "กลับเป็นค่าเริ่มต้น", Duration = 3 })
+			Library.ControlStyle = "Mac Glossy"
+			Window.RebuildControls()
+			Library:Notify({ Title = "รีเซ็ตแล้ว", Text = "กลับเป็นค่าเริ่มต้น" })
 		end })
-		tab:AddButton({ Name = "ปิดและทำลาย UI", Icon = "lucide:power", Callback = function() Library:Destroy() end })
 
 		return tab
 	end
 
-	------------------------------------------------------------
-	-- หมวดหมู่วิธีใช้งาน (คู่มือ + ตัวอย่างสดของ element ทุกชนิดของ Wind UI ยกเว้นรายชื่อ)
-	------------------------------------------------------------
+	-- [เพิ่ม] หมวดหมู่วิธีใช้งาน : คู่มือ + ตัวอย่างสดของ element ทุกชนิดของ Wind UI (ยกเว้นรายชื่อ/Dropdown)
 	function Window:AddHowToTab(info)
 		info = info or {}
-		local tab = Window:AddTab({ Name = info.Name or "วิธีใช้งาน", Sub = info.Sub or "คู่มือ + ตัวอย่างทุกอย่าง", Icon = info.Icon or "lucide:book-open" })
+		local tab = Window:AddTab({ Name = info.Name or "วิธีใช้งาน", Sub = info.Sub or "คู่มือ + ตัวอย่างทุกอย่าง", Icon = info.Icon })
 		local function try(label, fn)
 			local ok, err = pcall(fn)
 			if not ok then warn("[RUOK UI][วิธีใช้งาน] " .. label .. " : " .. tostring(err)) end
@@ -17408,90 +17691,73 @@ function Library:CreateWindow(cfg)
 		local function note(title, text)
 			try(title, function() tab:Paragraph({ Title = title, Desc = text }) end)
 		end
-		local function demoSection(title, desc, open)
+		local function demoSection(title, desc)
 			local sec
-			try(title, function() sec = tab:Section({ Title = title, Desc = desc, Box = true, BoxBorder = true, Opened = open ~= false }) end)
+			try(title, function() sec = tab:Section({ Title = title, Desc = desc, Box = true, BoxBorder = true, Opened = true }) end)
 			if sec and sec.Button then return sec end
-			return tab.Wind
+			return tab:WindTab()
 		end
 
 		tab:AddSection("เริ่มต้นใช้งาน")
-		note("1) สร้างหน้าต่าง", "เรียก Library:CreateWindow({ Title = \"ชื่อ\", Author = \"ข้อความรอง\" }) จะได้หน้าต่างแบบ Wind UI พร้อมขอบเรืองแสง ปุ่มมุมซ้ายบนแบบ Mac ปุ่มเปิด UI บนมือถือ และโปรไฟล์ผู้เล่นที่แถบข้าง")
+		note("1) สร้างหน้าต่าง", "Library:CreateWindow() สร้างหน้าต่างของ RUOK Hub (ขอบเรืองแสง แถบข้าง โปรไฟล์) แล้ว Window:AddTab({ Name, Sub, Icon }) เพื่อเพิ่มแท็บ")
 		try("code1", function()
-			tab:Code({ Title = "สร้างหน้าต่าง + แท็บ", CodeSize = 14, Code = "local Library = loadstring(game:HttpGet(\"URL\"))()\nlocal Window = Library:CreateWindow({\n    Title = \"! Clown\",\n    Author = \"r3z by uou\",\n})\nlocal Main = Window:AddTab({ Name = \"หลัก\", Sub = \"ฟังก์ชันหลัก\", Icon = \"lucide:home\" })\nWindow:AddHowToTab()\nWindow:AddSettingsTab()" })
+			tab:Code({ Title = "สร้างหน้าต่าง + แท็บ", CodeSize = 14, Code = "local Window = Library:CreateWindow()\nlocal Main = Window:AddTab({ Name = \"หลัก\", Sub = \"ฟังก์ชันหลัก\" })\nWindow:AddHowToTab()\nWindow:AddSettingsTab()" })
 		end)
-		note("2) เพิ่มปุ่ม / สวิตช์ / สไลเดอร์", "ใช้ Tab:AddSection, AddLabel, AddButton, AddToggle, AddSlider, AddTextbox, AddDropdown, AddKeybind, AddColorPicker ได้เหมือนเดิม ส่วน Tab:Button / Toggle / Slider / Input / Dropdown / Colorpicker / Keybind / ProgressBar / Section / Group / Space / Divider / HStack / VStack / Paragraph / Image / Code / Viewport คือ element ดั้งเดิมของ Wind UI เรียกผ่าน Tab ตัวเดียวกันได้เลย")
+		note("2) ใส่ปุ่ม / สวิตช์ / สไลเดอร์", "ของเดิมใช้ได้ทั้งหมด: Tab:AddSection, AddLabel, AddButton, AddToggle, AddSlider, AddDropdown, AddTextbox, AddKeybind, AddColorPicker ส่วน Tab:Button / Toggle / Slider / Input / Colorpicker / Keybind / ProgressBar / Section / Group / Space / Divider / HStack / VStack / Paragraph / Image / Code / Viewport คือ element ของ Wind UI เรียกผ่าน Tab เดียวกันได้เลย")
 
 		tab:AddSection("ปุ่มลัดมือถือ + ปุ่มลัดคอม")
-		note("ปุ่มลัดมือถือ (ปุ่มบนจอ)", "ใส่ Shortcut ในสวิตช์ เมื่อ \"เปิดสวิตช์\" ปุ่มลัดจะเด้งขึ้นกลางจอ กดเพื่อสั่งทำงาน ลากย้ายตำแหน่งได้ ปิดสวิตช์ปุ่มจะหายไป ปุ่มบนจอใช้ได้ทั้งมือถือ (นิ้ว) และคอม (เมาส์)")
-		note("ปุ่มลัดคอม (คีย์บอร์ด)", "บนคอมจะมีปุ่มรูปคีย์บอร์ดข้างสวิตช์ กดแล้วกดปุ่มที่ต้องการเพื่อตั้งปุ่มลัด (Backspace = ล้างปุ่ม, Esc = ยกเลิก) คอมใช้ปุ่มลัดบนจอแบบมือถือได้ แต่มือถือใช้ปุ่มคีย์บอร์ดไม่ได้เพราะไม่มีคีย์บอร์ด")
+		note("ปุ่มลัดมือถือ (ปุ่มบนจอ)", "ใส่ Shortcut ใน AddToggle เมื่อ \"เปิดสวิตช์\" ปุ่มลัดจะเด้งขึ้นบนจอ กดเพื่อสั่งทำงาน ลากย้ายได้ ปิดสวิตช์แล้วปุ่มจะหาย ใช้ได้ทั้งมือถือ (นิ้ว) และคอม (เมาส์)")
+		note("ปุ่มลัดคอม (คีย์บอร์ด)", "บนคอมจะมีปุ่มรูปคีย์บอร์ดข้างสวิตช์ กดแล้วกดปุ่มที่ต้องการเพื่อตั้งปุ่มลัด (Backspace = ล้าง, Esc = ยกเลิก) คอมใช้ปุ่มลัดบนจอได้ แต่มือถือใช้ปุ่มคีย์บอร์ดไม่ได้เพราะไม่มีคีย์บอร์ด")
 		try("code2", function()
-			tab:Code({ Title = "สวิตช์ที่มีปุ่มลัด", CodeSize = 14, Code = "Main:AddToggle({\n    Name = \"Auto Farm\",\n    Default = false,\n    Callback = function(on) print(\"สวิตช์\", on) end,\n    Shortcut = {\n        Key = Enum.KeyCode.E,       -- ปุ่มคีย์บอร์ด (คอม)\n        Mode = \"Toggle\",             -- \"Action\" = กดแล้วทำทันที | \"Toggle\" = กดค้างสถานะ\n        Callback = function(active) print(\"ปุ่มลัด\", active) end,\n    },\n})" })
+			tab:Code({ Title = "สวิตช์ที่มีปุ่มลัด", CodeSize = 14, Code = "Main:AddToggle({\n    Name = \"Auto Farm\",\n    Callback = function(on) print(on) end,\n    Shortcut = {\n        Key = Enum.KeyCode.E,   -- คีย์บอร์ด (คอม)\n        Mode = \"Toggle\",         -- \"Action\" หรือ \"Toggle\"\n        Callback = function(active) print(active) end,\n    },\n})" })
 		end)
-		note("รายชื่อ (Dropdown)", "Tab:AddDropdown({ Name = \"เลือกผู้เล่น\", Options = {\"A\", \"B\"}, Default = \"A\", Callback = function(v) end }) เลือกได้หลายตัวด้วย Multi = true และค้นหาด้วย Search = true (รายการสำหรับตัวอย่างสดด้านล่างไม่รวมรายชื่อ)")
+		note("รายชื่อ (Dropdown)", "Tab:AddDropdown({ Name = \"เลือกผู้เล่น\", Options = {\"A\", \"B\"}, Default = \"A\", Callback = function(v) end }) — ตัวอย่างสดด้านล่างไม่รวมรายชื่อ")
 
 		tab:AddSection("สวิตช์ / สไลเดอร์ / ปุ่มลัด (สไตล์กระจกเรืองแสง)")
 		tab:AddToggle({
 			Name = "สวิตช์ + ปุ่มลัด (ลองเปิดดู)", Desc = "เปิดแล้วจะมีปุ่มลัดลอยบนจอ", Default = false,
 			Callback = function(on) Library:Notify({ Title = "สวิตช์", Text = on and "เปิด" or "ปิด", Duration = 2 }) end,
-			Shortcut = { Id = "demo_toggle", Name = "ตัวอย่าง", Key = Enum.KeyCode.E, Mode = "Toggle", Callback = function(active)
+			Shortcut = { Id = "demo_toggle", Name = "Edit", Desc = "Edit Text", Key = Enum.KeyCode.E, Mode = "Toggle", Callback = function(active)
 				Library:Notify({ Title = "ปุ่มลัดทำงาน", Text = active and "ทำงาน" or "หยุด", Duration = 2 })
 			end },
 		})
 		tab:AddSlider({ Name = "สไลเดอร์ตัวอย่าง", Min = 0, Max = 100, Default = 50, Suffix = "%", Callback = function(v) end })
-		tab:AddKeybind({ Name = "ปุ่มคีย์ตัวอย่าง", Default = Enum.KeyCode.G, Callback = function(k)
-			Library:Notify({ Title = "กดปุ่ม " .. k.Name, Text = "ทำงานแล้ว", Duration = 2 })
-		end })
 
 		tab:AddSection("ตัวอย่าง element ของ Wind UI ทั้งหมด")
-
 		local h = demoSection("Button", "Tab:Button({}) — ปุ่มกดปกติ")
 		try("Button", function()
-			h:Button({ Title = "ปุ่มกด", Desc = "กดแล้วแจ้งเตือน", Icon = "mouse-pointer-click", Callback = function()
-				Library:Notify({ Title = "Button", Text = "กดปุ่มแล้ว", Duration = 2 })
-			end })
+			h:Button({ Title = "ปุ่มกด", Desc = "กดแล้วแจ้งเตือน", Callback = function() Library:Notify({ Title = "Button", Text = "กดปุ่มแล้ว", Duration = 2 }) end })
 		end)
-
 		h = demoSection("Toggle", "Tab:Toggle({}) — สวิตช์เปิด/ปิด (หรือ Checkbox)")
 		try("Toggle", function()
-			h:Toggle({ Title = "สวิตช์ (Wind)", Desc = "Type = \"Toggle\"", Value = false, Callback = function(v) end })
-			h:Toggle({ Title = "เช็กบ็อกซ์ (Wind)", Desc = "Type = \"Checkbox\"", Type = "Checkbox", Value = true, Callback = function(v) end })
+			h:Toggle({ Title = "สวิตช์ (Wind)", Value = false, Callback = function(v) end })
+			h:Toggle({ Title = "เช็กบ็อกซ์ (Wind)", Type = "Checkbox", Value = true, Callback = function(v) end })
 		end)
-
 		h = demoSection("Slider", "Tab:Slider({}) — แถบเลื่อนค่าตัวเลข")
 		try("Slider", function()
 			h:Slider({ Title = "แถบเลื่อน", Step = 1, Value = { Min = 0, Max = 100, Default = 40 }, Callback = function(v) end })
 		end)
-
 		h = demoSection("Input", "Tab:Input({}) — ช่องใส่ข้อความ (บรรทัดเดียว / หลายบรรทัด)")
 		try("Input", function()
 			h:Input({ Title = "ช่องข้อความ", Placeholder = "พิมพ์แล้วกด Enter", Callback = function(t) end })
 			h:Input({ Title = "หลายบรรทัด", Type = "Textarea", Placeholder = "พิมพ์ข้อความยาว ๆ", Callback = function(t) end })
 		end)
-
 		h = demoSection("Colorpicker", "Tab:Colorpicker({}) — เลือกสี")
 		try("Colorpicker", function()
 			h:Colorpicker({ Title = "เลือกสี (Wind)", Default = Theme.Accent, Callback = function(c) end })
 		end)
-
 		h = demoSection("Keybind", "Tab:Keybind({}) — ตั้งค่าปุ่มคีย์บอร์ด/เมาส์")
 		try("Keybind", function()
-			h:Keybind({ Title = "ปุ่มคีย์ (Wind)", Value = "F", Callback = function(k)
-				Library:Notify({ Title = "Keybind", Text = "กด " .. tostring(k), Duration = 2 })
-			end })
+			h:Keybind({ Title = "ปุ่มคีย์ (Wind)", Value = "F", Callback = function(k) Library:Notify({ Title = "Keybind", Text = "กด " .. tostring(k), Duration = 2 }) end })
 		end)
-
 		h = demoSection("ProgressBar", "Tab:ProgressBar({}) — แถบความคืบหน้า")
 		try("ProgressBar", function()
 			local pb = h:ProgressBar({ Title = "ความคืบหน้า", Value = { Min = 0, Max = 100, Default = 35 } })
-			h:Button({ Title = "สุ่มค่า", Icon = "dices", Callback = function()
-				pcall(function() pb:Set(math.random(0, 100)) end)
-			end })
+			h:Button({ Title = "สุ่มค่า", Callback = function() pcall(function() pb:Set(math.random(0, 100)) end) end })
 		end)
-
 		h = demoSection("Section / Group / Space / Divider / HStack / VStack", "จัดกลุ่มและเรียงองค์ประกอบ")
 		try("Layout", function()
-			h:Paragraph({ Title = "Section", Desc = "Tab:Section({ Title, Box, Opened }) ทำหัวข้อ/กล่องจัดกลุ่ม (พับได้) — ตัวที่เห็นอยู่นี้คือ Section" })
+			h:Paragraph({ Title = "Section", Desc = "Tab:Section({ Title, Box, Opened }) ทำหัวข้อ/กล่องจัดกลุ่ม (พับได้) — กล่องที่เห็นอยู่นี้คือ Section" })
 			h:Space()
 			h:Divider()
 			h:Space()
@@ -17508,38 +17774,29 @@ function Library:CreateWindow(cfg)
 			vs:Button({ Title = "VStack 1", Callback = function() end })
 			vs:Button({ Title = "VStack 2", Callback = function() end })
 		end)
-
 		h = demoSection("Paragraph", "Tab:Paragraph({}) — ข้อความ + รูป + ปุ่มย่อย")
 		try("Paragraph", function()
-			h:Paragraph({
-				Title = "ข้อความพร้อมปุ่มย่อย", Desc = "ใส่ Buttons = { { Title, Icon, Callback } } ได้หลายปุ่ม",
-				Buttons = {
-					{ Title = "คัดลอกข้อความ", Icon = "copy", Callback = function() copyText("RUOK Hub") Library:Notify({ Title = "คัดลอกแล้ว", Text = "RUOK Hub", Duration = 2 }) end },
-					{ Title = "แจ้งเตือน", Icon = "bell", Callback = function() Library:Notify({ Title = "สวัสดี", Text = "นี่คือปุ่มย่อย", Duration = 2 }) end },
-				},
-			})
+			h:Paragraph({ Title = "ข้อความพร้อมปุ่มย่อย", Desc = "ใส่ Buttons = { { Title, Icon, Callback } } ได้หลายปุ่ม", Buttons = {
+				{ Title = "คัดลอกข้อความ", Icon = "copy", Callback = function() copyText("RUOK Hub") Library:Notify({ Title = "คัดลอกแล้ว", Text = "RUOK Hub", Duration = 2 }) end },
+				{ Title = "แจ้งเตือน", Icon = "bell", Callback = function() Library:Notify({ Title = "สวัสดี", Text = "นี่คือปุ่มย่อย", Duration = 2 }) end },
+			} })
 		end)
-
 		h = demoSection("Image", "Tab:Image({}) — แสดงรูปภาพ")
 		try("Image", function()
 			h:Image({ Image = "rbxassetid://120997033468887", AspectRatio = "16:9", Radius = 12 })
 		end)
-
 		h = demoSection("Code", "Tab:Code({}) — แสดงโค้ด (รองรับ copy + theme)")
 		try("Code", function()
 			h:Code({ Title = "ตัวอย่างโค้ด", CodeSize = 14, Code = "print(\"Hello RUOK Hub\")\nfor i = 1, 3 do\n    print(i)\nend" })
 		end)
-
 		h = demoSection("Viewport", "Tab:Viewport({}) — แสดง 3D Object (ViewportFrame)")
 		try("Viewport", function()
 			local part = Instance.new("Part")
 			part.Size = Vector3.new(4, 4, 4)
 			part.Anchored = true
-			part.Material = Enum.Material.SmoothPlastic
 			part.Color = Theme.Accent
 			h:Viewport({ Object = part, Height = 200, Interactive = true })
 		end)
-
 		h = demoSection("Video", "Tab:Video({}) — เล่นวิดีโอ")
 		try("Video", function()
 			if h.Video then
@@ -17548,41 +17805,31 @@ function Library:CreateWindow(cfg)
 				h:Paragraph({ Title = "Video", Desc = "Wind UI เวอร์ชันในไฟล์นี้ (v1.6.65) ยังไม่มี element Video จึงแสดงเป็นข้อความแทน" })
 			end
 		end)
-
-		tab:AddSection("ปรับแต่ง UI")
-		note("ไปที่แท็บ Settings", "เปลี่ยนธีมสำเร็จรูป / สีหลัก-สีรอง (มีโค้ดสีและปุ่มบันทึกโค้ดสี) / ขนาดและความโปร่งใส / ขอบเรืองแสง / ปุ่มลัด / ชื่อและไอคอนมุมซ้ายบน แล้วกด \"บันทึกการตั้งค่า\"")
 		return tab
 	end
 
+	Window:SetTransparency(Library.Transparency)
 	return Window
 end
-
 
 ----------------------------------------------------------------
 -- ตัวอย่างการรันใช้งาน
 ----------------------------------------------------------------
-local Window = Library:CreateWindow({ Title = "! Clown", Author = "r3z by uou" })
+local Window = Library:CreateWindow()
 
-if Window then
-	local Main = Window:AddTab({ Name = "หลัก", Sub = "ฟังก์ชันหลัก", Icon = "lucide:home" })
-	Main:AddSection("ตัวอย่างสวิตช์ + ปุ่มลัด")
-	Main:AddToggle({
-		Name = "Auto Farm",
-		Desc = "เปิดแล้วจะมีปุ่มลัดบนจอ (คอมตั้งปุ่มคีย์บอร์ดได้)",
-		Default = false,
-		Callback = function(on) print("Auto Farm สวิตช์:", on) end,
-		Shortcut = {
-			Key = Enum.KeyCode.R,
-			Mode = "Toggle",
-			Callback = function(active) print("Auto Farm ปุ่มลัด:", active) end,
-		},
-	})
-	Main:AddSlider({ Name = "ความเร็ว", Min = 1, Max = 100, Default = 30, Suffix = "x", Callback = function(v) print("ความเร็ว", v) end })
+local Main = Window:AddTab({ Name = "หลัก", Sub = "ฟังก์ชันหลัก" })
+Main:AddSection("ตัวอย่างสวิตช์ + ปุ่มลัด")
+Main:AddToggle({
+	Name = "Auto Farm",
+	Desc = "เปิดแล้วจะมีปุ่มลัดบนจอ (คอมตั้งปุ่มคีย์บอร์ดได้)",
+	Callback = function(on) print("Auto Farm สวิตช์:", on) end,
+	Shortcut = { Key = Enum.KeyCode.R, Mode = "Toggle", Callback = function(active) print("Auto Farm ปุ่มลัด:", active) end },
+})
+Main:AddSlider({ Name = "ความเร็ว", Min = 1, Max = 100, Default = 30, Suffix = "x", Callback = function(v) print("ความเร็ว", v) end })
 
-	Window:AddHowToTab()
-	Window:AddSettingsTab({ Name = "Settings", Sub = "ปรับแต่ง UI" })
+Window:AddHowToTab()
+Window:AddSettingsTab({ Name = "Settings", Sub = "ปรับแต่ง UI" })
 
-	Library:Notify({ Title = "ระบบ", Text = "โหลด RUOK Hub + Wind UI สำเร็จ!", Duration = 4 })
-end
+Library:Notify({ Title = "ระบบ", Text = "เพิ่ม Wind UI + ปุ่มลัด + สไตล์ปุ่มควบคุมแล้ว!", Duration = 4 })
 
 return Library
